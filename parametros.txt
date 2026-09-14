@@ -1,4 +1,4 @@
-DATA=material
-Semilla=1658743
-tam_poblacion=100
-n_Sol_Greedy=0.2
+DATA=Material de práctica 1 y 2-20260910
+SEMILLA=1658743
+K=5
+algorimtos= gre gra

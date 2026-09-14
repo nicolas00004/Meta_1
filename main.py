@@ -1,8 +1,21 @@
 import os
+from random import Random
+
 import extracion_datos
+import greedy
+import Extraccion_parametros
+import Funcion_evaluacion
+import greedy_aleatorio
 
 if __name__ == "__main__":
-    carpeta = "Material de práctica 1 y 2-20260910"
+
+    # Cargar los parámetros desde el archivo
+    parametros = Extraccion_parametros.cargar_param("parametros.txt")
+    carpeta=parametros['DATA']
+    semilla=parametros['SEMILLA']
+    k=int(parametros['K'])
+    random=Random()
+    random.seed(semilla)
 
     # 1. Obtener la lista de todos los archivos .tsp en la carpeta
     archivos_tsp = [f for f in os.listdir(carpeta) if f.endswith('.tsp')]
@@ -34,6 +47,17 @@ if __name__ == "__main__":
             print(f"Comentario: {comentario}")
             print(f"Número de nodos: {n}")
             print(f"Forma de la matriz de distancias: {m_distancias.shape}")
+            vector_asignacion = []
+            vector = greedy.greedy(m_distancias)
+            distancia_total = Funcion_evaluacion.evaluar(m_distancias, vector)
+            print(f"Distancia total algoritmo greedy: {distancia_total}")
+
+            vector_asignacion_greedy=greedy_aleatorio.greedy_aleatorio(m_distancias,random,k)
+            distancia_total_greedy=Funcion_evaluacion.evaluar(m_distancias, vector_asignacion_greedy)
+            print(f"Distancia total algoritmo greedy aleatorio: {distancia_total_greedy}")
             print("=" * 50 + "\n")
+
         else:
             print(f"Error al cargar el archivo {nombre_fichero}\n")
+
+#TODO hay algun fallo ya que todas las soluciones greedy sale mejor que greedy aleatorio
