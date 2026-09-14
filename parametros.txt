@@ -1,0 +1,4 @@
+DATA=material
+Semilla=1658743
+tam_poblacion=100
+n_Sol_Greedy=0.2
