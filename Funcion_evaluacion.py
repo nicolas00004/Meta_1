@@ -20,7 +20,7 @@ def evaluar(matriz_distancias,vector_asignaciones):
 
     for i in range(n):
         origen = vector_asignaciones[i]
-        destino = vector_asignaciones[(i + 1) % n]  # Vuelve al inicio después del último nodo
+        destino = vector_asignaciones[(i + 1) % n]
         distancia_total += matriz_distancias[origen][destino]
 
     return distancia_total

@@ -17,6 +17,7 @@ if __name__ == "__main__":
     random=Random()
     random.seed(semilla)
 
+
     # 1. Obtener la lista de todos los archivos .tsp en la carpeta
     archivos_tsp = [f for f in os.listdir(carpeta) if f.endswith('.tsp')]
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
             print(f"Comentario: {comentario}")
             print(f"Número de nodos: {n}")
             print(f"Forma de la matriz de distancias: {m_distancias.shape}")
-            vector_asignacion = []
+
             vector = greedy.greedy(m_distancias)
             distancia_total = Funcion_evaluacion.evaluar(m_distancias, vector)
             print(f"Distancia total algoritmo greedy: {distancia_total}")
