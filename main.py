@@ -15,8 +15,10 @@ if __name__ == "__main__":
     semilla=parametros['SEMILLA']
     k=int(parametros['K'])
     random=Random()
-    random.seed(semilla)
 
+    semila=Extraccion_parametros.permutar_semilla_circular(semilla)
+    print("La semilla es:", semilla)
+    random.seed(semilla)
 
     # 1. Obtener la lista de todos los archivos .tsp en la carpeta
     archivos_tsp = [f for f in os.listdir(carpeta) if f.endswith('.tsp')]
@@ -61,4 +63,3 @@ if __name__ == "__main__":
         else:
             print(f"Error al cargar el archivo {nombre_fichero}\n")
 
-#TODO hay algun fallo ya que todas las soluciones greedy sale mejor que greedy aleatorio
