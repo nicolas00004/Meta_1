@@ -1,5 +1,5 @@
 import numpy as np
-
+import Funcion_evaluacion
 
 
 
@@ -17,3 +17,7 @@ def greedy(m_distancias):
 
     return vector_asignacion
 
+def ejecucion(m_distancias, configuracion):
+    vector = greedy(m_distancias)
+    distancia_total = Funcion_evaluacion.evaluar(m_distancias, vector)
+    return distancia_total

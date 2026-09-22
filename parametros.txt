@@ -1,4 +1,5 @@
 DATA=Material de práctica 1 y 2-20260910
 SEMILLA=1658743
 K=5
-algorimtos= gre gra
+ALGORITMO= grea
+N_EJECUCIONES=3

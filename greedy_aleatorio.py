@@ -1,6 +1,7 @@
 import numpy as np
 import greedy
 import random
+import Funcion_evaluacion
 
 def greedy_aleatorio(m_distancias,random,k):
 
@@ -15,7 +16,7 @@ def greedy_aleatorio(m_distancias,random,k):
             v_asignacion.append(vector[indice_aleatorio][0])
             vector.remove(vector[indice_aleatorio])
         else:
-            indice_aleatorio = int(random.randint(0, k))
+            indice_aleatorio = int(random.randint(0, k-1))
             v_asignacion.append(vector[indice_aleatorio][0])
             vector.remove(vector[indice_aleatorio])
 
@@ -23,3 +24,7 @@ def greedy_aleatorio(m_distancias,random,k):
     return v_asignacion
 
 
+def ejecucion(m_distancias, k,random):
+    vector_asignacion_greedy =greedy_aleatorio(m_distancias, random, k)
+    distancia_total_greedy = Funcion_evaluacion.evaluar(m_distancias, vector_asignacion_greedy)
+    return distancia_total_greedy
