@@ -1,39 +1,40 @@
 import os
 import extracion_datos
+import numpy as np
+from alg_greedy import algoritmo_greedy
+from alg_greedy_aleatorio import algoritmo_greedy_aleatorizado
 
 if __name__ == "__main__":
     carpeta = "Material de práctica 1 y 2-20260910"
-
-    # 1. Obtener la lista de todos los archivos .tsp en la carpeta
     archivos_tsp = [f for f in os.listdir(carpeta) if f.endswith('.tsp')]
 
-    # Diccionario para guardar las matrices y datos de cada problema s
-    problemas = {}
+    dni_base = 77958591
+    semillas = [
+        dni_base,
+        int(str(dni_base)[1:] + str(dni_base)[0]),
+        int(str(dni_base)[2:] + str(dni_base)[:2])
+    ]
 
-    print(f"Se encontraron {len(archivos_tsp)} archivos .tsp para procesar.\n")
-
-    # 2. Iterar sobre cada archivo y ejecutar la extracción
     for nombre_fichero in archivos_tsp:
         ruta_archivo = os.path.join(carpeta, nombre_fichero)
-
         n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
         if n is not None:
-            # Almacenar en el diccionario
-            problemas[nombre_fichero] = {
-                "n": n,
-                "coordenadas": m_coordenadas,
-                "distancias": m_distancias,
-                "nombre": nombre,
-                "comentario": comentario
-            }
+            print("=" * 60)
+            print(f"PROCESANDO INSTANCIA: {nombre} ({n} nodos)")
+            print("=" * 60)
 
-            print("=" * 50)
-            print(f"Fichero procesado: {nombre_fichero}")
-            print(f"Nombre del problema: {nombre}")
-            print(f"Comentario: {comentario}")
-            print(f"Número de nodos: {n}")
-            print(f"Forma de la matriz de distancias: {m_distancias.shape}")
-            print("=" * 50 + "\n")
-        else:
-            print(f"Error al cargar el archivo {nombre_fichero}\n")
+            #Ejecuta Algoritmo Greedy Determinista
+            sol_gre, coste_gre = algoritmo_greedy(m_distancias)
+            print(f"[GREEDY DETERMINISTA] Coste: {coste_gre:.2f}")
+
+            #Ejecuta Algoritmo Greedy Aleatorizado (3 ejecuciones con semillas)
+
+            print("[GREEDY ALEATORIZADO (K=5)]")
+            costes_gra = []
+            for i, sem in enumerate(semillas, 1):
+                sol_gra, coste_gra = algoritmo_greedy_aleatorizado(m_distancias, k=5, semilla=sem)
+                costes_gra.append(coste_gra)
+                print(f"  - Ejecución {i} (Semilla {sem}): Coste = {coste_gra:.2f}")
+
+            print(f"  -> Media GRA: {np.mean(costes_gra):.2f} | Desv. Típica: {np.std(costes_gra):.2f}\n")

@@ -1,4 +1,7 @@
 DATA=material
-Semilla=1658743
+archivos=x
+Semilla=77958591
+algoritmos=GRE GRA
+K=5
 tam_poblacion=100
 n_Sol_Greedy=0.2
