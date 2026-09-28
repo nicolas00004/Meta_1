@@ -18,6 +18,7 @@ if __name__ == "__main__":
     k=int(parametros['K'])
     algoritmos=parametros['ALGORITMO'].split()
     n_ejecucion=int(parametros['N_EJECUCIONES'])
+    n_iteraciones=int(parametros['N_ITERACIONES'])
 
     random=Random()
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
                             print(f"Comentario: {comentario}")
                             print(f"Número de nodos: {n}")
                             print(f"Forma de la matriz de distancias: {m_distancias.shape}")
-                            print(f"Distancia total algoritmo greedy aleatorio: {busqueda_local.ejecucion(m_distancias, n)}")
+                            print(f"Distancia total algoritmo greedy aleatorio: {busqueda_local.ejecucion(m_distancias, n,n_iteraciones,k,random)}")
                             print("x" * 10)
                         else:
                             print("Fallo en la lectura de fichero")
