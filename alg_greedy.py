@@ -3,8 +3,18 @@ from funcion_coste import calcular_coste_solucion
 
 def algoritmo_greedy(m_distancias):
     """
-    Algoritmo Greedy Determinista (GRE)
-    """
+        @brief Algoritmo Greedy Determinista (GRE) para resolver el Problema del Viajante de Comercio (TSP).
+
+        @details Este algoritmo construye una solución seleccionando iterativamente la ciudad
+        no visitada más cercana a la ciudad actual. Comienza seleccionando como ciudad inicial
+        aquella cuya suma total de distancias al resto de ciudades sea mínima.
+
+        @param m_distancias Matriz cuadrada de distancias entre las ciudades (NumPy ndarray de dimensión NxN).
+
+        @return tuple Un par compuesto por:
+            - **solucion** (*list*): Lista ordenada con los índices de las ciudades que forman el recorrido.
+            - **coste** (*float/int*): Coste o distancia total del recorrido calculado.
+        """
     n = m_distancias.shape[0]
 
 
@@ -31,5 +41,3 @@ def algoritmo_greedy(m_distancias):
     coste = calcular_coste_solucion(solucion, m_distancias)
     return solucion, coste
 
-
-#TODO: Comentar la función.
