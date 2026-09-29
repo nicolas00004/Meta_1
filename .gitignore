@@ -1,0 +1,10 @@
+# Logs generados por la práctica
+logs/
+
+# Entorno virtual y caché de Python
+.venv/
+__pycache__/
+*.pyc
+
+# Configuración de PyCharm
+.idea/

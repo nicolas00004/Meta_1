@@ -1,6 +1,6 @@
 DATA=Material de práctica 1 y 2-20260910
 SEMILLA=1658743
 K=5
-ALGORITMO= b_local
+ALGORITMO=b_local gre grea
 N_EJECUCIONES=3
 N_ITERACIONES=10000

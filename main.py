@@ -15,6 +15,7 @@ if __name__ == "__main__":
     parametros = Extraccion_parametros.cargar_param("parametros.txt")
     carpeta=parametros['DATA']
     semilla=parametros['SEMILLA']
+    semilla_inicial = semilla
     k=int(parametros['K'])
     algoritmos=parametros['ALGORITMO'].split()
     n_ejecucion=int(parametros['N_EJECUCIONES'])
@@ -34,9 +35,11 @@ if __name__ == "__main__":
                 for nombre_fichero in archivos_tsp:
                     #Carga los datos del fichero
                     ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     logger = Logs(
                         os.path.join(
-                            "logs", f"{os.path.splitext(nombre_fichero)[0]}.log"
+                            "logs", algoritmo,
+                            f"{nombre_base}_{algoritmo}_{semilla_inicial}_ejecucion_1.log",
                         )
                     )
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
@@ -60,7 +63,7 @@ if __name__ == "__main__":
                         resultado, tiempo = logger.ejecutar_y_registrar(
                             algoritmo,
                             nombre_fichero,
-                            semilla,
+                            semilla_inicial,
                             1,
                             lambda: greedy.ejecucion(m_distancias, parametros),
                         )
@@ -74,11 +77,7 @@ if __name__ == "__main__":
                 for nombre_fichero in archivos_tsp:
                     #Carga los datos del fichero
                     ruta_archivo = os.path.join(carpeta, nombre_fichero)
-                    logger = Logs(
-                        os.path.join(
-                            "logs", f"{os.path.splitext(nombre_fichero)[0]}.log"
-                        )
-                    )
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
                     for ejecu in range(n_ejecucion):
@@ -87,6 +86,12 @@ if __name__ == "__main__":
                         print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
                         random.seed(n_semilla)
                         semilla = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
 
 
 
@@ -122,11 +127,7 @@ if __name__ == "__main__":
                 for nombre_fichero in archivos_tsp:
                     #Carga los datos del fichero
                     ruta_archivo = os.path.join(carpeta, nombre_fichero)
-                    logger = Logs(
-                        os.path.join(
-                            "logs", f"{os.path.splitext(nombre_fichero)[0]}.log"
-                        )
-                    )
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
                     for ejecu in range(n_ejecucion):
@@ -135,6 +136,12 @@ if __name__ == "__main__":
                         print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
                         random.seed(n_semilla)
                         semilla = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
 
 
 
