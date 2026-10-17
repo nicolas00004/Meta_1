@@ -80,11 +80,11 @@ def tabla_algoritmo(datos, alg):
                 celdas += ["--", "--"]
         filas.append(f"{etiqueta} & " + " & ".join(celdas) + " \\\\")
     filas.append("\\bottomrule\n\\end{tabular}}")
-    semillas = ", ".join(
-        f"{i}: " + "/".join(str(r["semilla"]) for r in datos.get((i, alg), [])) for i in INSTANCIAS
+    semillas = "; ".join(
+        f"{i}: " + ", ".join(str(r["semilla"]) for r in datos.get((i, alg), [])) for i in INSTANCIAS
         if datos.get((i, alg))
     )
-    filas.append(f"\\caption{{Resultados de {NOMBRES[alg]} (semillas por instancia, en orden de ejecución: {semillas}).}}")
+    filas.append(f"\\caption[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]} (semillas por instancia, en orden de ejecución: {semillas}).}}")
     filas.append(f"\\label{{tab:{alg}-res}}\n\\end{{table}}\n")
     return "\n".join(filas)
 
@@ -116,7 +116,7 @@ def tabla_resumen(datos):
 
 
 def tabla_tabu(datos):
-    filas = ["\\begin{table}[H]\n\\centering\\small",
+    filas = ["\\begin{table}[H]\n\\centering\\footnotesize",
              "\\begin{tabular}{lrrrrr}\n\\toprule",
              "Instancia & Ejec. & Empeoramientos & Reinicios (I/D) & Última mejora global & Coste final \\\\\n\\midrule"]
     for i in INSTANCIAS:
