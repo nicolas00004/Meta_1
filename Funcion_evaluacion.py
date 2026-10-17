@@ -29,6 +29,14 @@ def factorizacion(m_distancias, vector_asignaciones, posi, posj, m_valor_pasado)
     if posi == posj:
         return False
 
+    return coste_intercambio(m_distancias, vector_asignaciones, posi, posj, m_valor_pasado) < m_valor_pasado
+
+
+def coste_intercambio(m_distancias, vector_asignaciones, posi, posj, m_valor_pasado):
+    """Devuelve el coste que tendría la solución tras intercambiar posi y posj."""
+    if posi == posj:
+        return m_valor_pasado
+
     n = len(vector_asignaciones)
 
     # Predecesores y sucesores considerando el recorrido circular (módulo n)
@@ -79,9 +87,7 @@ def factorizacion(m_distancias, vector_asignaciones, posi, posj, m_valor_pasado)
             m_distancias[node_i][vector_asignaciones[next_j]]
         )
 
-    m_valor_actual = m_valor_pasado - peso_a_quitar + peso_a_anadir
-
-    return m_valor_actual < m_valor_pasado
+    return m_valor_pasado - peso_a_quitar + peso_a_anadir
 
 
 def check_move(matriz_distancias,vector_asignaciones,posi,posj,peso_actual):

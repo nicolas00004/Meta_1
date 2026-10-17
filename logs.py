@@ -139,6 +139,61 @@ class Logs:
             "RESULT",
         )
 
+    def log_inicio_tabu(self, solucion, coste):
+        self._vaciar_movimientos()
+        self.log_solucion_inicial(solucion, coste)
+
+    def log_movimiento_tabu(
+        self,
+        iteracion,
+        pos_i,
+        pos_j,
+        coste_anterior,
+        coste_actual,
+        coste_mejor_momento,
+        coste_mejor_global,
+        estancamiento,
+    ):
+        tipo = "MEJORA" if coste_actual < coste_anterior else "EMPEORAMIENTO"
+        self._movimientos_pendientes.append(
+            f"[{self._obtener_tiempo()}] [TABU] Iteración {iteracion}: "
+            f"intercambio ({pos_i}, {pos_j}) — {tipo}\n"
+            f"[{self._obtener_tiempo()}] [TABU] Coste anterior: {coste_anterior}\n"
+            f"[{self._obtener_tiempo()}] [TABU] Coste nuevo: {coste_actual}\n"
+            f"[{self._obtener_tiempo()}] [TABU] Mejor momento actual: "
+            f"{coste_mejor_momento}; mejor global: {coste_mejor_global}; "
+            f"estancamiento: {estancamiento}\n"
+            f"[{self._obtener_tiempo()}] [TABU] ---\n"
+        )
+        if len(self._movimientos_pendientes) >= 100:
+            self._vaciar_movimientos()
+
+    def log_reinicio_tabu(self, iteracion, tipo, solucion, coste):
+        self._vaciar_movimientos()
+        self.log(
+            f"Iteración {iteracion}: estancamiento detectado, nueva solución "
+            f"por {tipo}",
+            "RESTART",
+        )
+        self.log(f"  Solución: {solucion}", "RESTART")
+        self.log(f"  Coste: {coste}", "RESTART")
+
+    def log_fin_tabu(self, solucion, coste, movimientos, reinicios):
+        self._resumen_busqueda_local = {
+            "Movimientos realizados": movimientos,
+            "Reinicios (oscilación estratégica)": reinicios,
+            "Coste final": coste,
+        }
+        self._vaciar_movimientos()
+        self.log(
+            f"Búsqueda tabú finalizada; movimientos: {movimientos}; "
+            f"reinicios: {reinicios}",
+            "RESULT",
+        )
+        self.log("Mejor solución global:", "RESULT")
+        self.log(f"  {solucion}", "RESULT")
+        self.log(f"Coste final: {coste}", "RESULT")
+
     def ejecutar_y_registrar(
         self, algoritmo, fichero, semilla, numero_ejecucion, funcion, **parametros
     ):

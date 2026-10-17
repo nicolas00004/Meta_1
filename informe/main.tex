@@ -1,0 +1,161 @@
+\documentclass[a4paper,12pt]{article}
+
+% ===========================
+% PAQUETES
+% ===========================
+\usepackage[utf8]{inputenc}   % Acentos
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-noshorthands]{babel}   % Idioma español ("Tabla" en vez de "Cuadro")
+\usepackage{graphicx}         % Imágenes
+\usepackage{fancyhdr}         % Encabezado y pie de página
+\usepackage[hidelinks]{hyperref}         % Hipervínculos en el índice
+\usepackage{tocloft}          % Mejor control de índices
+\usepackage{listings}
+\usepackage[table]{xcolor}    % Colores (una sola carga para evitar el "option clash")
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb} % Expresiones matemáticas
+\usepackage{appendix}
+\usepackage[margin=2.5cm]{geometry}
+
+\graphicspath{{imagenes/}}
+
+% Ajuste para eliminar aviso de fancyhdr sobre headheight
+\setlength{\headheight}{15pt}
+
+% Configuración básica de Listings para Python
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small, % Fuente monoespacio pequeña
+    keywordstyle=\color{blue}\bfseries, % Palabras clave en azul y negrita
+    commentstyle=\color{green!60!black}\itshape, % Comentarios en verde cursiva
+    stringstyle=\color{red}, % Cadenas de texto en rojo
+    showstringspaces=false,
+    tabsize=4,
+    captionpos=b % Posición del caption (b=bottom, t=top)
+}
+\renewcommand{\lstlistingname}{Listado}
+
+% Definimos un nuevo comando para funciones inline
+\newcommand{\function}[1]{\lstinline[language=Python, basicstyle=\ttfamily\small, columns=fixed]{#1}}
+
+% ===========================
+% PSEUDOCÓDIGO EN ESPAÑOL
+% ===========================
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\listalgorithmname}{Índice de algoritmos}
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicfunction{\textbf{función}}
+\algrenewcommand\algorithmicprocedure{\textbf{procedimiento}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicelse{\textbf{si no}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicwhile{\textbf{mientras}}
+\algrenewcommand\algorithmicreturn{\textbf{devolver}}
+\algrenewcommand{\algorithmiccomment}[1]{\hfill $\triangleright$ \textit{#1}}
+
+% ===========================
+% ENCABEZADO Y PIE
+% ===========================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Práctica 1 - UJACAR (TSP)}
+\fancyhead[R]{Metaheurísticas}
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\appendixpagename}{Anexo}
+\renewcommand{\appendixname}{Anexo}
+\renewcommand{\appendixtocname}{Anexo}
+
+\begin{document}
+
+% ===========================
+% PORTADA PERSONALIZADA
+% ===========================
+\begin{titlepage}
+    \centering
+
+    % Título principal
+    {\Huge \textbf{Práctica 1}\par}
+    \vspace{0.3cm}
+    {\Large Guion 1\par}
+    \vspace{0.5cm}
+    {\Large \textbf{Búsqueda Local y Trayectorias: El Viajante de Comercio (TSP)}\par}
+    \vspace{1cm}
+    {\Large Metaheurísticas (Curso 2026/2027)\par}
+    \vspace{1cm}
+
+    % Algoritmos implementados (exigido por la normativa de entrega)
+    {\large \textbf{Algoritmos implementados:}\par}
+    \vspace{0.2cm}
+    Greedy $\cdot$ Greedy aleatorio $\cdot$ Búsqueda local del primer mejor (DLB) $\cdot$ Búsqueda tabú\par
+    \vfill
+
+    % Autores y universidad
+    {\large \textbf{Autores:}\par}
+    \vspace{0.3cm}
+    \begin{tabular}{lll}
+        Alejandro Ríos Cabello & arc00166 & DNI: XXXXXXXXX \\
+        Nicolás Rafael Chelaru Tanase & nrct0001 & DNI: XXXXXXXXX \\
+    \end{tabular}\par
+    \vspace{0.5cm}
+    {\large \textbf{Grupo:} XX\par}
+    \vspace{1cm}
+
+    {\large Universidad de Jaén\par}
+    \vspace{0.5cm}
+
+    % Fecha
+    {\large \today\par}
+
+    % Logo abajo
+    \vfill
+    \IfFileExists{imagenes/ujaen.jpg}{\includegraphics[width=0.3\textwidth]{imagenes/ujaen.jpg}}{\textbf{Universidad de Jaén}}
+
+\end{titlepage}
+
+\clearpage
+
+% ===========================
+% ÍNDICE GENERAL
+% ===========================
+\tableofcontents
+\clearpage
+
+% ===========================
+% ÍNDICES DE FIGURAS Y TABLAS
+% ===========================
+\renewcommand{\listfigurename}{Índice de Figuras}
+\renewcommand{\listtablename}{Índice de Tablas}
+
+\listoffigures
+\listoftables
+\clearpage
+
+% ===========================
+% CONTENIDO (se importa de otro archivo)
+% ===========================
+\input{contenido.tex}
+
+\clearpage
+
+\begin{appendices}
+  \appendixpage           % página con el título "Anexo"
+  \addappheadtotoc        % añade esa página al TOC
+
+  \section{Carpeta de Logs}
+Enlace de descarga a la carpeta con los Logs: \url{https://drive.google.com/drive/folders/1JOPyPUdfYNtIpM7BfSW0vkRCTi284ucn?usp=sharing}
+
+La carpeta contiene un subdirectorio por algoritmo (\texttt{gre}, \texttt{grea}, \texttt{b\_local} y \texttt{tabu}). Cada fichero se llama \texttt{<instancia>\_<algoritmo>\_<semilla>\_ejecucion\_<n>.log} y registra los parámetros, la solución inicial, cada movimiento con su coste (de mejora o, en el tabú, también de empeoramiento), los reinicios por estancamiento, la solución final y un resumen con el coste y el tiempo de la ejecución.
+
+\end{appendices}
+
+\end{document}

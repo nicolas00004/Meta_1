@@ -6,6 +6,7 @@ import greedy
 import Extraccion_parametros
 import greedy_aleatorio
 import Busqueda_local as busqueda_local
+import Busqueda_Tabu as busqueda_tabu
 from logs import Logs
 
 
@@ -20,6 +21,9 @@ if __name__ == "__main__":
     algoritmos=parametros['ALGORITMO'].split()
     n_ejecucion=int(parametros['N_EJECUCIONES'])
     n_iteraciones=int(parametros['N_ITERACIONES'])
+    tenencia=int(parametros['TENENCIA'])
+    estancamiento=float(parametros['ESTANCAMIENTO'])
+    oscilacion=float(parametros['OSCILACION'])
 
     random=Random()
 
@@ -177,6 +181,56 @@ if __name__ == "__main__":
                                 n_iteraciones=n_iteraciones,
                             )
                             print(f"Distancia total algoritmo búsqueda local: {resultado}")
+                            print(f"Tiempo de ejecución: {tiempo:.6f} s")
+                            print("x" * 10)
+                        else:
+                            print("Fallo en la lectura de fichero")
+            case "tabu":
+                for nombre_fichero in archivos_tsp:
+                    #Carga los datos del fichero
+                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
+                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
+
+                    for ejecu in range(n_ejecucion):
+                        #Carga de la semilla
+                        n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
+                        print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
+                        random.seed(n_semilla)
+                        semilla = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
+
+                        if n is not None:
+                            print(f"FICHERO PROCESADO: {nombre_fichero}")
+                            print(f"Número de nodos: {n}")
+                            resultado, tiempo = logger.ejecutar_y_registrar(
+                                algoritmo,
+                                nombre_fichero,
+                                n_semilla,
+                                ejecu + 1,
+                                lambda: busqueda_tabu.ejecucion(
+                                    m_distancias,
+                                    n,
+                                    n_iteraciones,
+                                    k,
+                                    random,
+                                    tenencia,
+                                    estancamiento,
+                                    oscilacion,
+                                    logger=logger,
+                                ),
+                                k=k,
+                                n_iteraciones=n_iteraciones,
+                                tenencia=tenencia,
+                                estancamiento=estancamiento,
+                                oscilacion=oscilacion,
+                            )
+                            print(f"Distancia total algoritmo búsqueda tabú: {resultado}")
                             print(f"Tiempo de ejecución: {tiempo:.6f} s")
                             print("x" * 10)
                         else:
