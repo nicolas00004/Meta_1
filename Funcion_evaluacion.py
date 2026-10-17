@@ -21,7 +21,9 @@ def evaluar(matriz_distancias,vector_asignaciones):
     for i in range(n):
         origen = vector_asignaciones[i]
         destino = vector_asignaciones[(i + 1) % n]
-        distancia_total += matriz_distancias[origen][destino]
+        # float() para acumular en doble precisión: con NumPy 2, 0.0 + float32 da float32
+        # y en instancias grandes se pierden las mejoras pequeñas por redondeo
+        distancia_total += float(matriz_distancias[origen][destino])
 
     return distancia_total
 
@@ -87,7 +89,7 @@ def coste_intercambio(m_distancias, vector_asignaciones, posi, posj, m_valor_pas
             m_distancias[node_i][vector_asignaciones[next_j]]
         )
 
-    return m_valor_pasado - peso_a_quitar + peso_a_anadir
+    return float(m_valor_pasado) - float(peso_a_quitar) + float(peso_a_anadir)
 
 
 def check_move(matriz_distancias,vector_asignaciones,posi,posj,peso_actual):

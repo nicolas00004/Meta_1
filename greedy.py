@@ -8,7 +8,7 @@ def greedy(m_distancias):
     vector= []
     vector_asignacion = []
     for i in range(m_distancias.shape[0]):
-        vector.append((i,sum(m_distancias[i])))
+        vector.append((i,float(m_distancias[i].sum(dtype=np.float64))))
 
     vector.sort(key=lambda x: x[1])
     for i in range(len(vector)):

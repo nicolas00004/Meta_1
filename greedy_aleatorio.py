@@ -8,7 +8,7 @@ def greedy_aleatorio(m_distancias,random,k):
     vector= []
     v_asignacion=[]
     for i in range(m_distancias.shape[0]):
-        vector.append((i, sum(m_distancias[i])))
+        vector.append((i, float(m_distancias[i].sum(dtype=np.float64))))
         vector.sort(key=lambda x: x[1])
     while len(v_asignacion) < m_distancias.shape[0]:
         if len(vector)<k:
