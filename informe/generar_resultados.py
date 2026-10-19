@@ -69,8 +69,11 @@ def tabla_algoritmo(datos, alg):
             v = datos.get((i, alg), [])
             celdas += [num(v[k]["coste"]), num(v[k]["tiempo"], 3)] if k < len(v) else ["--", "--"]
         filas.append(f"Ejecución {k + 1} & " + " & ".join(celdas) + " \\\\")
-    filas.append("\\midrule")
-    for etiqueta, f in (("Media", st.mean), ("Desv. típica", st.stdev)):
+    # Con una sola ejecución (greedy) los estadísticos no aportan nada
+    estadisticos = (("Mejor", min), ("Peor", max), ("Media", st.mean), ("Desv. típica", st.stdev))
+    if n_ejec > 1:
+        filas.append("\\midrule")
+    for etiqueta, f in estadisticos if n_ejec > 1 else ():
         celdas = []
         for i in INSTANCIAS:
             v = datos.get((i, alg), [])
@@ -80,11 +83,17 @@ def tabla_algoritmo(datos, alg):
                 celdas += ["--", "--"]
         filas.append(f"{etiqueta} & " + " & ".join(celdas) + " \\\\")
     filas.append("\\bottomrule\n\\end{tabular}}")
-    semillas = "; ".join(
-        f"{i}: " + ", ".join(str(r["semilla"]) for r in datos.get((i, alg), [])) for i in INSTANCIAS
-        if datos.get((i, alg))
-    )
-    filas.append(f"\\caption[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]} (semillas por instancia, en orden de ejecución: {semillas}).}}")
+    por_instancia = {i: ", ".join(str(r["semilla"]) for r in datos[(i, alg)]) for i in INSTANCIAS
+                     if datos.get((i, alg))}
+    if n_ejec == 1:
+        semillas = "determinista: una sola ejecución"
+    elif len(set(por_instancia.values())) == 1:
+        semillas = f"semillas, en orden de ejecución: {next(iter(por_instancia.values()))}"
+    else:
+        semillas = "semillas por instancia, en orden de ejecución: " + "; ".join(
+            f"{i}: {s}" for i, s in por_instancia.items())
+    nota = " Mejor y peor: menor y mayor valor de cada columna." if n_ejec > 1 else ""
+    filas.append(f"\\caption[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]} ({semillas}).{nota}}}")
     filas.append(f"\\label{{tab:{alg}-res}}\n\\end{{table}}\n")
     return "\n".join(filas)
 
@@ -186,7 +195,8 @@ def figura_convergencia(datos):
     fig, ejes = plt.subplots(len(insts), 1, figsize=(8, 3.1 * len(insts)))
     for ax, inst in zip(ejes, insts):
         rt = mejor_ejecucion(datos, inst, "tabu")
-        rb = mejor_ejecucion(datos, inst, "b_local")
+        # Misma ejecución (misma semilla) que el tabú, para que partan de la misma solución
+        rb = next(r for r in datos[(inst, "b_local")] if r["ejecucion"] == rt["ejecucion"])
         pt = convergencia(rt["ruta"], True)
         pb = convergencia(rb["ruta"], False)
         ax.plot([p[0] for p in pt], [p[1] for p in pt], color=COLORES["tabu"], lw=0.5, alpha=0.45,
@@ -195,7 +205,7 @@ def figura_convergencia(datos):
         ax.plot([p[0] for p in pb], [p[1] for p in pb], color=COLORES["b_local"], lw=1.6, label="Búsqueda local")
         ax.axhline(OPTIMOS[inst], color="black", ls="--", lw=0.8, label="Óptimo")
         ax.set_yscale("log")
-        ax.set_title(f"{inst} (tabú semilla {rt['semilla']}, BL semilla {rb['semilla']})", fontsize=10)
+        ax.set_title(f"{inst} (semilla {rt['semilla']})", fontsize=10)
         ax.set_xlabel("Iteración")
         ax.set_ylabel("Coste")
         ax.grid(alpha=0.3)

@@ -1,0 +1,72 @@
+% Diagrama de flujo de la búsqueda tabú (se incluye desde contenido.tex)
+% "?`" es el signo de apertura de interrogación: funciona igual con pdfLaTeX y con XeTeX
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=5mm and 8mm,
+    every node/.style={font=\footnotesize, align=center},
+    proceso/.style={rectangle, draw, rounded corners=2pt, fill=blue!6, minimum width=44mm, minimum height=7mm, inner sep=3pt},
+    decision/.style={diamond, draw, fill=orange!10, aspect=2.4, inner sep=1pt},
+    extremo/.style={rectangle, draw, rounded corners=8pt, fill=gray!15, minimum width=30mm, minimum height=7mm},
+    flecha/.style={-{Stealth[length=2mm]}, thick},
+    linea/.style={thick},
+]
+    % Columna principal
+    \node[extremo] (inicio) {Inicio};
+    \node[proceso, below=of inicio] (init) {$\pi \gets$ GreedyAleatorio$(D,K)$\\ $\pi_{mom} \gets \pi$; \ $\pi_{glob} \gets \pi$\\ $T \gets 0$; \ $dlb \gets 0$; \ $it \gets 0$; \ $est \gets 0$};
+    \node[decision, below=of init] (quedan) {?`$it < M$?};
+    \node[extremo, right=14mm of quedan] (fin) {Devolver $\pi_{glob}$};
+    \node[proceso, below=of quedan] (explorar) {Explorar el entorno con el DLB\\ descartando los movimientos tabú};
+    \node[decision, below=of explorar] (mejora) {?`Algún vecino\\ mejora $\pi$?};
+    \node[proceso, below=8mm of mejora] (aplicar) {Actualizar MCP: $-1$ a los activos\\ y $t$ a posiciones y ciudades\\ Aplicar el intercambio $(i,j)$\\ $dlb[i] \gets dlb[j] \gets 0$; \ $it \gets it+1$\\ MLP: $+1$ a los $n$ arcos de $\pi$};
+    \node[decision, below=of aplicar] (mommejor) {?`$F(\pi) < F(\pi_{mom})$?};
+    \node[proceso, below=6mm of mommejor, xshift=-32mm, minimum width=36mm] (actmom) {$\pi_{mom} \gets \pi$; \ $est \gets 0$\\ actualizar $\pi_{glob}$ si mejora};
+    \node[proceso, below=6mm of mommejor, xshift=32mm, minimum width=36mm] (incest) {$est \gets est+1$};
+    \node[decision, below=24mm of mommejor] (estanca) {?`$est \geq e \cdot M$?};
+    \node[decision, below=of estanca] (azar) {?`aleatorio $< p$?};
+    \node[proceso, below=6mm of azar, xshift=-28mm, minimum width=36mm] (intens) {Intensificación\\ (arcos más frecuentes)};
+    \node[proceso, below=6mm of azar, xshift=28mm, minimum width=36mm] (divers) {Diversificación\\ (arcos menos frecuentes)};
+    \node[proceso, below=22mm of azar] (reinicio) {$\pi_{mom} \gets \pi$; \ actualizar $\pi_{glob}$ si mejora\\ Reiniciar MCP, $dlb$ y $est$ (la MLP se conserva)};
+
+    % Rama lateral: ningún vecino mejora
+    \node[decision, right=10mm of mejora] (notabu) {?`Hay vecinos\\ no tabú?};
+    \node[proceso, below=8mm of notabu, minimum width=28mm] (peores) {Elegir la mejor\\ de las peores};
+    \node[proceso, right=6mm of notabu, minimum width=24mm] (forzar) {$est \gets e \cdot M$\\ (forzar reinicio)};
+
+    % Puntos de unión
+    \coordinate (union1) at ($(estanca.north) + (0, 5mm)$);
+    \coordinate (union2) at ($(reinicio.north) + (0, 5mm)$);
+    \coordinate (bucle) at ($(actmom.west) + (-6mm, 0)$);
+
+    % Flechas
+    \draw[flecha] (inicio) -- (init);
+    \draw[flecha] (init) -- (quedan);
+    \draw[flecha] (quedan) -- node[right] {sí} (explorar);
+    \draw[flecha] (quedan) -- node[above] {no} (fin);
+    \draw[flecha] (explorar) -- (mejora);
+    \draw[flecha] (mejora) -- node[right] {sí} (aplicar);
+    \draw[flecha] (mejora) -- node[above] {no} (notabu);
+    \draw[flecha] (notabu) -- node[right] {sí} (peores);
+    \draw[flecha] (notabu) -- node[above] {no} (forzar);
+    \draw[flecha] (peores) |- (aplicar);
+    \draw[flecha] (aplicar) -- (mommejor);
+    \draw[flecha] (mommejor.west) -| node[pos=0.3, above] {sí} (actmom.north);
+    \draw[flecha] (mommejor.east) -| node[pos=0.3, above] {no} (incest.north);
+    \draw[linea] (actmom.south) |- (union1);
+    \draw[linea] (incest.south) |- (union1);
+    \draw[linea] (forzar.south) |- (union1);
+    \draw[flecha] (union1) -- (estanca.north);
+    \draw[flecha] (estanca) -- node[right] {sí} (azar);
+    \draw[flecha] (azar.west) -| node[pos=0.3, above] {sí} (intens.north);
+    \draw[flecha] (azar.east) -| node[pos=0.3, above] {no} (divers.north);
+    \draw[linea] (intens.south) |- (union2);
+    \draw[linea] (divers.south) |- (union2);
+    \draw[flecha] (union2) -- (reinicio.north);
+
+    % Vueltas al inicio del bucle
+    \draw[flecha] (estanca.west) -- node[above, pos=0.15] {no} (estanca.west -| bucle) |- (quedan.west);
+    \draw[linea] (reinicio.west) -| (estanca.west -| bucle);
+\end{tikzpicture}
+\caption{Diagrama de flujo de la búsqueda tabú.}
+\label{fig:diagrama-tabu}
+\end{figure}

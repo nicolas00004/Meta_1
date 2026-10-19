@@ -84,6 +84,9 @@ if __name__ == "__main__":
                     nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
+                    # Cada algoritmo e instancia parte de la misma semilla: la ejecución k
+                    # usa la misma semilla en todos los algoritmos (lo exige el guion)
+                    semilla = semilla_inicial
                     for ejecu in range(n_ejecucion):
                         #Carga de la semilla
                         n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
@@ -134,6 +137,9 @@ if __name__ == "__main__":
                     nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
+                    # Cada algoritmo e instancia parte de la misma semilla: la ejecución k
+                    # usa la misma semilla en todos los algoritmos (lo exige el guion)
+                    semilla = semilla_inicial
                     for ejecu in range(n_ejecucion):
                         #Carga de la semilla
                         n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
@@ -192,6 +198,9 @@ if __name__ == "__main__":
                     nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
+                    # Cada algoritmo e instancia parte de la misma semilla: la ejecución k
+                    # usa la misma semilla en todos los algoritmos (lo exige el guion)
+                    semilla = semilla_inicial
                     for ejecu in range(n_ejecucion):
                         #Carga de la semilla
                         n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)

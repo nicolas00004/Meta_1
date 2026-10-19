@@ -8,60 +8,60 @@
 
 \subsection{El problema del viajante de comercio}
 
-El problema del viajante de comercio (TSP, \textit{Travelling Salesman Problem}) consiste en, dado un conjunto de $n$ ciudades y la distancia entre cada par de ellas, encontrar el recorrido cerrado de longitud mínima que visita cada ciudad exactamente una vez y vuelve a la ciudad de origen. Es un problema NP-duro: el número de recorridos distintos crece como $(n-1)!/2$, por lo que para las instancias usadas (de 130 a 18.512 ciudades) es inviable una búsqueda exhaustiva y se recurre a metaheurísticas.
+El problema del viajante de comercio (TSP, \textit{Travelling Salesman Problem}) consiste en encontrar, dado un conjunto de $n$ ciudades y la distancia entre cada par de ellas, el recorrido cerrado más corto que pasa por todas las ciudades exactamente una vez y vuelve a la de origen. Se trata de un problema NP-duro. El número de recorridos distintos crece como $(n-1)!/2$, así que con las instancias que usamos (de 130 a 18.512 ciudades) no es viable una búsqueda exhaustiva y hay que recurrir a metaheurísticas.
 
-Las instancias proceden de TSPLIB (\texttt{ch130}, \texttt{pr144}, \texttt{a280}, \texttt{u1060} y \texttt{d18512}). Cada fichero contiene las coordenadas $(x_i, y_i)$ de las ciudades y el problema es \textbf{simétrico}: la distancia entre dos ciudades es la euclídea,
+Las instancias son de TSPLIB (\texttt{ch130}, \texttt{pr144}, \texttt{a280}, \texttt{u1060} y \texttt{d18512}). En cada fichero vienen las coordenadas $(x_i, y_i)$ de las ciudades. El problema es simétrico y la distancia entre dos ciudades es la euclídea,
 \begin{equation}
 d(i,j) = d(j,i) = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}.
 \end{equation}
-Al leer el fichero se calcula una sola vez la matriz de distancias $D$ de tamaño $n \times n$, de forma que consultar una distancia durante la búsqueda cuesta $O(1)$.
+Al leer el fichero calculamos una sola vez la matriz de distancias $D$, de tamaño $n \times n$, y así consultar una distancia durante la búsqueda cuesta $O(1)$.
 
 \subsection{Representación de las soluciones}
 
-Una solución es una \textbf{permutación} $\pi = (\pi_0, \pi_1, \dots, \pi_{n-1})$ de las ciudades $\{0, \dots, n-1\}$: $\pi_k$ es la ciudad visitada en la posición $k$ del recorrido. Tras la última ciudad se vuelve a la primera, así que el recorrido es circular. Esta representación garantiza por construcción que cada ciudad aparece una sola vez, y todos los operadores empleados transforman una permutación en otra permutación.
+Representamos cada solución como una permutación $\pi = (\pi_0, \pi_1, \dots, \pi_{n-1})$ de las ciudades $\{0, \dots, n-1\}$, donde $\pi_k$ es la ciudad que se visita en la posición $k$ del recorrido. Después de la última ciudad se vuelve a la primera, por lo que el recorrido es circular. Con esta representación cada ciudad aparece una sola vez por construcción, y todos los operadores que usamos transforman una permutación en otra.
 
 \subsection{Función objetivo}
 
-Se minimiza la longitud total del recorrido:
+El objetivo es minimizar la longitud total del recorrido,
 \begin{equation}
 F(\pi) = \sum_{k=0}^{n-1} d\left(\pi_k, \pi_{(k+1) \bmod n}\right).
 \end{equation}
-Evaluar una solución completa cuesta $O(n)$. Como medida de calidad se usa la desviación respecto al óptimo conocido de cada instancia:
+Evaluar una solución completa tiene coste $O(n)$. Para medir la calidad usamos la desviación respecto al óptimo conocido de cada instancia,
 \begin{equation}
 \text{Desv}(\pi) = 100 \cdot \frac{F(\pi) - F^{*}}{F^{*}}.
 \end{equation}
 
 \subsection{Operadores comunes}
 
-\paragraph{Operador de intercambio (2-opt del guion).} Dadas dos posiciones $i \neq j$, se intercambian las ciudades que ocupan: $\pi_i \leftrightarrow \pi_j$. El entorno de una solución contiene $n(n-1)/2$ vecinos.
+\paragraph{Operador de intercambio (2-opt del guion).} Dadas dos posiciones $i \neq j$, se intercambian las ciudades que hay en ellas ($\pi_i \leftrightarrow \pi_j$). Con este operador cada solución tiene $n(n-1)/2$ vecinos.
 
-\paragraph{Evaluación factorizada.} Al intercambiar dos posiciones solo cambian los arcos que tocan a esas posiciones, por lo que el coste del vecino se obtiene en $O(1)$ a partir del coste actual:
+\paragraph{Evaluación factorizada.} Cuando se intercambian dos posiciones solo cambian los arcos que llegan a ellas o salen de ellas, así que el coste del vecino se puede calcular en $O(1)$ a partir del coste actual:
 \begin{equation}
 F(\pi') = F(\pi) - \text{arcos que desaparecen} + \text{arcos nuevos}.
 \end{equation}
-Si $i$ y $j$ no son adyacentes desaparecen los cuatro arcos $(\pi_{i-1},\pi_i)$, $(\pi_i,\pi_{i+1})$, $(\pi_{j-1},\pi_j)$, $(\pi_j,\pi_{j+1})$ y aparecen los cuatro que unen esos vecinos con la ciudad intercambiada. Si son adyacentes (por ejemplo $j = i+1$), el arco $(\pi_i, \pi_j)$ no desaparece sino que se invierte, y solo cambian los dos arcos exteriores. Los índices se toman módulo $n$, de manera que el caso de la primera y la última posición (que también son adyacentes en un recorrido circular) se trata igual que cualquier otro par de posiciones contiguas.
+Si $i$ y $j$ no son adyacentes, desaparecen los cuatro arcos $(\pi_{i-1},\pi_i)$, $(\pi_i,\pi_{i+1})$, $(\pi_{j-1},\pi_j)$, $(\pi_j,\pi_{j+1})$ y aparecen otros cuatro que unen esos vecinos con la ciudad intercambiada. Si son adyacentes (por ejemplo, $j = i+1$), el arco $(\pi_i, \pi_j)$ se mantiene aunque invertido, y solo cambian los dos arcos exteriores. Los índices se toman módulo $n$. De esta forma la primera y la última posición, que en un recorrido circular también son adyacentes, se tratan igual que cualquier otro par de posiciones contiguas.
 
-\paragraph{Don't Look Bits (DLB).} Es un vector de $n$ bits, uno por posición. Un bit a 0 indica que merece la pena explorar los intercambios de esa posición; un bit a 1, que ya se exploraron todos sin encontrar mejora. Al empezar todos están a 0; cuando una posición agota sus movimientos sin mejora se pone a 1, y cuando participa en un movimiento que se aplica se vuelve a poner a 0. Así la búsqueda se concentra en las zonas del recorrido que han cambiado recientemente.
+\paragraph{Don't Look Bits (DLB).} Es un vector de $n$ bits, uno por posición. Si el bit de una posición está a 0, merece la pena explorar sus intercambios, y si está a 1 es que ya se exploraron todos y ninguno mejoraba. Al principio todos valen 0. Cuando una posición agota sus movimientos sin encontrar mejora su bit pasa a 1, y vuelve a 0 si la posición participa en un movimiento que se aplica. Con esto la búsqueda se centra en las partes del recorrido que han cambiado hace poco.
 
-\paragraph{Generación de semillas.} Partiendo de la semilla \texttt{1658743}, cada ejecución usa la anterior rotada un dígito a la izquierda ($1658743 \rightarrow 6587431 \rightarrow 5874316 \rightarrow \dots$). La semilla inicializa el generador \texttt{random.Random} que usan el greedy aleatorio, la búsqueda local y la búsqueda tabú, por lo que cada ejecución es reproducible.
+\paragraph{Generación de semillas.} Partimos de la semilla base \texttt{1658743} y en cada ejecución rotamos la anterior un dígito a la izquierda, así que las tres ejecuciones usan las semillas $6587431$, $5874316$ y $8743165$. La rotación se reinicia desde la semilla base en cada algoritmo y en cada instancia, de modo que la ejecución $k$ usa la misma semilla en todos los algoritmos, tal y como pide el guion. Con la semilla se inicializa el generador \texttt{random.Random} que usan el greedy aleatorio, la búsqueda local y la búsqueda tabú, y así cualquier ejecución se puede reproducir.
 
 \subsection{Descripción del código}
 
-El código está escrito en Python y se organiza en los siguientes módulos:
+El código está hecho en Python y lo hemos dividido en estos módulos:
 \begin{itemize}
     \item \texttt{main.py}: lee \texttt{parametros.txt}, carga cada instancia y lanza los algoritmos indicados en \texttt{ALGORITMO}, una vez por semilla.
     \item \texttt{extracion\_datos.py}: lee el fichero \texttt{.tsp} y calcula la matriz de distancias con NumPy.
     \item \texttt{Extraccion\_parametros.py}: lee los parámetros y genera las semillas por rotación.
     \item \texttt{Funcion\_evaluacion.py}: función objetivo, evaluación factorizada del intercambio y aplicación del movimiento.
     \item \texttt{greedy.py}, \texttt{greedy\_aleatorio.py}, \texttt{Busqueda\_local.py} y \texttt{Busqueda\_Tabu.py}: un módulo por algoritmo.
-    \item \texttt{logs.py}: escritura de los ficheros de registro. Los movimientos se acumulan en memoria y se escriben por bloques, y el tiempo que se dedica a escribir se descuenta del tiempo de ejecución que se informa.
+    \item \texttt{logs.py}: escribe los ficheros de registro. Los movimientos se van guardando en memoria y se escriben por bloques. El tiempo que se pierde escribiendo se resta del tiempo de ejecución que damos en los resultados.
 \end{itemize}
 
 \section{Algoritmos}
 
 \subsection{Greedy}
 
-Para cada ciudad se calcula la suma de sus distancias al resto, se ordena el vector de pares $\langle$ciudad, suma$\rangle$ de menor a mayor y el recorrido es ese orden. Es determinista y cuesta $O(n^2 + n \log n)$.
+Para cada ciudad calculamos la suma de sus distancias al resto, ordenamos el vector de pares $\langle$ciudad, suma$\rangle$ de menor a mayor y tomamos ese orden como recorrido. Es un algoritmo determinista y su coste es $O(n^2 + n \log n)$.
 
 \begin{algorithm}[H]
 \caption{Greedy}
@@ -80,7 +80,7 @@ Para cada ciudad se calcula la suma de sus distancias al resto, se ordena el vec
 
 \subsection{Greedy aleatorio}
 
-Parte del mismo vector ordenado, pero en cada paso elige al azar una de las $K = 5$ primeras ciudades que quedan, la añade al recorrido y la elimina del vector. Cuando quedan menos de $K$ ciudades se elige entre las restantes.
+Usa el mismo vector ordenado, pero en cada paso escoge al azar una de las $K = 5$ primeras ciudades que quedan, la añade al recorrido y la quita del vector. Cuando quedan menos de $K$ ciudades se escoge entre las que haya.
 
 \begin{algorithm}[H]
 \caption{Greedy aleatorio}
@@ -99,7 +99,7 @@ Parte del mismo vector ordenado, pero en cada paso elige al azar una de las $K =
 
 \subsection{Búsqueda local del primer mejor con DLB}
 
-Parte de una solución del greedy aleatorio. Recorre las posiciones con el bit DLB a 0 y, para cada una, prueba los intercambios con el resto de posiciones (de forma circular a partir de $i+1$). En cuanto un intercambio mejora el coste lo aplica (primer mejor), reactiva los bits de las dos posiciones y vuelve a explorar la misma posición. Si ninguno mejora, desactiva su bit. Termina cuando todos los bits están a 1 (óptimo local respecto al operador de intercambio) o cuando se alcanzan 10.000 movimientos.
+La búsqueda local parte de una solución del greedy aleatorio. Va recorriendo las posiciones cuyo bit DLB está a 0 y, para cada una, prueba a intercambiarla con el resto de posiciones (de forma circular, empezando en $i+1$). En cuanto encuentra un intercambio que mejora el coste lo aplica (primer mejor), reactiva los bits de las dos posiciones y vuelve a explorar la misma posición. Si no hay ninguno que mejore, desactiva su bit. El algoritmo termina cuando todos los bits están a 1, es decir, cuando se ha llegado a un óptimo local para el operador de intercambio, o cuando se alcanzan los 10.000 movimientos.
 
 \begin{algorithm}[H]
 \caption{Búsqueda local del primer mejor con DLB}
@@ -132,17 +132,17 @@ Parte de una solución del greedy aleatorio. Recorre las posiciones con el bit D
 
 \subsection{Búsqueda tabú}
 
-La búsqueda tabú amplía la búsqueda local para que no se detenga en el primer óptimo local: se ejecutan siempre las 10.000 iteraciones y, cuando ningún vecino permitido mejora la solución actual, se aplica el \textbf{mejor vecino no tabú} aunque empeore el coste (``la mejor de las peores''). Durante la búsqueda se mantienen tres soluciones: la \textit{solución actual}, el \textit{mejor del momento actual} (la mejor desde el último reinicio) y el \textit{mejor global}.
+La búsqueda tabú extiende la búsqueda local para que no se pare en el primer óptimo local. Siempre se ejecutan las 10.000 iteraciones y, cuando ningún vecino permitido mejora la solución actual, se aplica el mejor vecino no tabú aunque empeore el coste (``la mejor de las peores''). Durante la búsqueda guardamos tres soluciones, que son la solución actual, el mejor del momento actual (la mejor desde el último reinicio) y el mejor global.
 
-\paragraph{Memorias.} Se usa una única matriz $T$ de enteros de tamaño $n \times n$:
+\paragraph{Memorias.} Para las dos memorias usamos una sola matriz $T$ de enteros de tamaño $n \times n$.
 \begin{itemize}
-    \item \textbf{Memoria a corto plazo (MCP)}, en el triángulo superior ($T[a][b]$ con $a < b$). Al intercambiar las posiciones $i$ y $j$, que contienen las ciudades $\pi_i$ y $\pi_j$, se guardan dos valores con la tenencia tabú $t = 10$: el par de posiciones $T[\min(i,j)][\max(i,j)] \gets t$ y el par de ciudades $T[\min(\pi_i,\pi_j)][\max(\pi_i,\pi_j)] \gets t$. Un movimiento es tabú, y se descarta al generar el entorno, si cualquiera de sus dos celdas es mayor que 0. No se usa criterio de aspiración. Para no recorrer la matriz entera en cada iteración, las celdas activas se guardan en un conjunto: en cada iteración se decrementan solo esas celdas y se eliminan las que llegan a 0.
-    \item \textbf{Memoria a largo plazo (MLP)}, en el triángulo inferior ($T[a][b]$ con $a > b$). En cada iteración se incrementa en 1 la celda de cada arco $(\pi_k, \pi_{k+1})$ de la solución actual, es decir, $n$ celdas por iteración. Como el problema es simétrico, el arco $(u,v)$ y el $(v,u)$ comparten celda.
+    \item \textbf{Memoria a corto plazo (MCP)}, en el triángulo superior ($T[a][b]$ con $a < b$). Cuando se intercambian las posiciones $i$ y $j$, que contienen las ciudades $\pi_i$ y $\pi_j$, se guardan dos valores con la tenencia tabú $t = 10$. Para el par de posiciones se hace $T[\min(i,j)][\max(i,j)] \gets t$ y para el par de ciudades se hace $T[\min(\pi_i,\pi_j)][\max(\pi_i,\pi_j)] \gets t$. Un movimiento es tabú si cualquiera de sus dos celdas es mayor que 0, y en ese caso se descarta al generar el entorno. No hemos usado criterio de aspiración. Para no tener que recorrer la matriz entera en cada iteración guardamos las celdas activas en un conjunto, y en cada iteración solo se decrementan esas celdas y se quitan las que llegan a 0.
+    \item \textbf{Memoria a largo plazo (MLP)}, en el triángulo inferior ($T[a][b]$ con $a > b$). En cada iteración se suma 1 a la celda de cada arco $(\pi_k, \pi_{k+1})$ de la solución actual, o sea, $n$ celdas por iteración. Al ser un problema simétrico, los arcos $(u,v)$ y $(v,u)$ comparten celda.
 \end{itemize}
 
-\paragraph{Exploración del entorno.} Es la misma que la de la búsqueda local (DLB y primer mejor), pero saltando los movimientos tabú. Mientras se exploran los vecinos se guarda el mejor vecino no tabú visto. Si se encuentra una mejora se aplica. Si todos los bits del DLB quedan a 1 sin mejora, se aplica ese mejor vecino. Tras aplicar cualquier movimiento solo se reactivan los bits de las dos posiciones intercambiadas, por lo que la siguiente exploración evalúa unos $2n$ vecinos en lugar de los $n^2/2$ del entorno completo.
+\paragraph{Exploración del entorno.} Se explora igual que en la búsqueda local (DLB y primer mejor), pero saltándose los movimientos tabú. Mientras se recorren los vecinos se va guardando el mejor vecino no tabú que ha aparecido. Si se encuentra una mejora se aplica, y si todos los bits del DLB acaban a 1 sin ninguna mejora se aplica ese mejor vecino. Después de aplicar un movimiento, sea del tipo que sea, solo se reactivan los bits de las dos posiciones intercambiadas. Por eso la siguiente exploración evalúa unos $2n$ vecinos y no los $n^2/2$ del entorno completo.
 
-\paragraph{Estancamiento y oscilación estratégica.} Cada movimiento que no mejora al mejor del momento actual cuenta como movimiento de empeoramiento. Si se acumulan $0{,}05 \cdot 10.000 = 500$ consecutivos, se considera que la búsqueda se ha estancado y se genera una solución nueva: con probabilidad $0{,}5$ por \textbf{intensificación} y con probabilidad $0{,}5$ por \textbf{diversificación}. Ambos operadores construyen un recorrido desde una ciudad aleatoria y, en cada paso, eligen al azar entre las $K = 5$ ciudades no visitadas cuyo arco con la ciudad actual tiene \textbf{mayor} frecuencia en la MLP (intensificación: reconstruye los arcos que más han aparecido en las buenas soluciones) o \textbf{menor} frecuencia (diversificación: lleva la búsqueda a zonas poco visitadas). Después se reinician la MCP, el DLB, el contador de estancamiento y el mejor del momento actual; la MLP se conserva.
+\paragraph{Estancamiento y oscilación estratégica.} Contamos como movimiento de empeoramiento cualquier movimiento que no mejore al mejor del momento actual. Cuando se acumulan $0{,}05 \cdot 10.000 = 500$ seguidos, consideramos que la búsqueda se ha estancado y generamos una solución nueva, por intensificación con probabilidad $0{,}5$ o por diversificación con probabilidad $0{,}5$. Los dos operadores construyen un recorrido empezando en una ciudad aleatoria. En cada paso eligen al azar entre las $K = 5$ ciudades no visitadas cuyo arco con la ciudad actual tiene mayor frecuencia en la MLP, en el caso de la intensificación, o menor frecuencia, en el de la diversificación. La intensificación reconstruye así los arcos que más han aparecido en las buenas soluciones, mientras que la diversificación lleva la búsqueda a zonas poco visitadas. Después se reinician la MCP, el DLB, el contador de estancamiento y el mejor del momento actual. La MLP se conserva.
 
 \begin{algorithm}[H]
 \caption{Búsqueda tabú}
@@ -156,15 +156,19 @@ La búsqueda tabú amplía la búsqueda local para que no se detenga en el prime
     \If{no existe}
         \State $(i, j) \gets$ mejor movimiento no tabú evaluado \Comment{la mejor de las peores}
     \EndIf
-    \State decrementar en 1 las celdas activas de la MCP
-    \State $T[\text{posiciones } i,j] \gets t$; \quad $T[\text{ciudades } \pi_i, \pi_j] \gets t$
-    \State intercambiar $\pi_i$ y $\pi_j$; \quad $dlb[i] \gets 0$; \quad $dlb[j] \gets 0$; \quad $it \gets it + 1$
-    \State incrementar en la MLP los $n$ arcos de $\pi$
-    \If{$F(\pi) < F(\pi_{mom})$}
-        \State $\pi_{mom} \gets \pi$; \quad $est \gets 0$
-        \If{$F(\pi) < F(\pi_{glob})$} $\pi_{glob} \gets \pi$ \EndIf
+    \If{todos los movimientos evaluados son tabú}
+        \State $est \gets e \cdot M$ \Comment{se fuerza el reinicio}
     \Else
-        \State $est \gets est + 1$
+        \State decrementar en 1 las celdas activas de la MCP
+        \State $T[\text{posiciones } i,j] \gets t$; \quad $T[\text{ciudades } \pi_i, \pi_j] \gets t$
+        \State intercambiar $\pi_i$ y $\pi_j$; \quad $dlb[i] \gets 0$; \quad $dlb[j] \gets 0$; \quad $it \gets it + 1$
+        \State incrementar en la MLP los $n$ arcos de $\pi$
+        \If{$F(\pi) < F(\pi_{mom})$}
+            \State $\pi_{mom} \gets \pi$; \quad $est \gets 0$
+            \If{$F(\pi) < F(\pi_{glob})$} $\pi_{glob} \gets \pi$ \EndIf
+        \Else
+            \State $est \gets est + 1$
+        \EndIf
     \EndIf
     \If{$est \geq e \cdot M$}
         \If{aleatorio $< p$}
@@ -172,12 +176,17 @@ La búsqueda tabú amplía la búsqueda local para que no se detenga en el prime
         \Else
             \State $\pi \gets$ Diversificacion$(T, K)$
         \EndIf
-        \State $\pi_{mom} \gets \pi$; \quad reiniciar MCP, $dlb$ y $est$ \Comment{la MLP no se reinicia}
+        \State $\pi_{mom} \gets \pi$; \quad actualizar $\pi_{glob}$ si $\pi$ lo mejora
+        \State reiniciar MCP, $dlb$ y $est$ \Comment{la MLP no se reinicia}
     \EndIf
 \EndWhile
 \State \Return $\pi_{glob}$
 \end{algorithmic}
 \end{algorithm}
+
+En la Figura~\ref{fig:diagrama-tabu} se muestra el mismo proceso en forma de diagrama de flujo.
+
+\input{diagrama_tabu.tex}
 
 \begin{algorithm}[H]
 \caption{Construcción de una solución a partir de la MLP (intensificación y diversificación)}
@@ -202,7 +211,7 @@ La búsqueda tabú amplía la búsqueda local para que no se detenga en el prime
 
 \subsection{Parámetros y semillas}
 
-Todos los parámetros se leen de \texttt{parametros.txt}:
+Todos los parámetros se leen del fichero \texttt{parametros.txt}.
 
 \begin{table}[H]
 \centering
@@ -210,7 +219,7 @@ Todos los parámetros se leen de \texttt{parametros.txt}:
 \toprule
 Parámetro & Valor & Algoritmos \\
 \midrule
-Semilla inicial & 1658743 (rotación de dígitos) & GA, BL, Tabú \\
+Semillas & 6587431, 5874316, 8743165 & GA, BL, Tabú \\
 Ejecuciones por instancia & 3 (1 en el greedy, que es determinista) & Todos \\
 $K$ & 5 & GA, BL, Tabú \\
 Máximo de iteraciones & 10.000 & BL, Tabú \\
@@ -223,11 +232,11 @@ Oscilación estratégica & 50\,\% & Tabú \\
 \label{tab:parametros}
 \end{table}
 
-Como \texttt{main.py} encadena la rotación de la semilla de una ejecución a la siguiente y de un fichero al siguiente, cada algoritmo usa en cada instancia las semillas que se indican en el pie de su tabla de resultados. Los tiempos se midieron en el mismo equipo y no incluyen la escritura de los logs.
+En todos los algoritmos y en todas las instancias la ejecución $k$ usa la misma semilla. Así, en cada ejecución la búsqueda local y la búsqueda tabú parten de la misma solución del greedy aleatorio y sus resultados se pueden comparar directamente. Los tiempos se han medido todos en el mismo equipo y no incluyen la escritura de los logs.
 
 \subsection{Resultados}
 
-Las Tablas~\ref{tab:gre-res} a~\ref{tab:tabu-res} recogen, en el formato de la plantilla de la asignatura, el coste y el tiempo de cada ejecución junto con su media y desviación típica. La Tabla~\ref{tab:resumen} resume la desviación media respecto al óptimo y el tiempo medio. Los óptimos utilizados son: ch130 = 6.110, pr144 = 58.537, a280 = 2.579, u1060 = 224.094 y d18512 = 645.238.
+En las Tablas~\ref{tab:gre-res} a~\ref{tab:tabu-res} aparecen, con el formato de la plantilla de la asignatura, el coste y el tiempo de cada ejecución, además del mejor y el peor valor, la media y la desviación típica. La Tabla~\ref{tab:resumen} resume la desviación media respecto al óptimo y el tiempo medio. Como óptimos hemos tomado ch130 = 6.110, pr144 = 58.537, a280 = 2.579, u1060 = 224.094 y d18512 = 645.238.
 
 \input{tablas/tabla_gre.tex}
 \input{tablas/tabla_grea.tex}
@@ -251,28 +260,28 @@ Las Tablas~\ref{tab:gre-res} a~\ref{tab:tabu-res} recogen, en el formato de la p
 
 \subsection{Análisis de los algoritmos}
 
-\paragraph{Greedy y greedy aleatorio.} Ambos dan recorridos entre 6 y 80 veces más largos que el óptimo (Tabla~\ref{tab:resumen}). La causa es el criterio de construcción: ordenar las ciudades por la suma de sus distancias al resto coloca primero las ciudades centrales y después las periféricas, pero no tiene en cuenta si dos ciudades consecutivas del recorrido están cerca entre sí. El resultado es un recorrido que salta de un extremo a otro del plano. La aleatoriedad del greedy aleatorio, al elegir entre las $K = 5$ siguientes, no corrige este defecto: su media queda muy cerca de la del greedy (entre un 2\,\% mejor y un 3\,\% peor según la instancia) y solo añade dispersión (Figura~\ref{fig:boxplot}). Su valor está en que es instantáneo y en que proporciona soluciones iniciales distintas para las búsquedas basadas en trayectorias.
+\paragraph{Greedy y greedy aleatorio.} Los dos dan recorridos entre 6 y 80 veces más largos que el óptimo (Tabla~\ref{tab:resumen}). El problema está en el criterio de construcción. Al ordenar las ciudades por la suma de sus distancias al resto quedan primero las ciudades centrales y después las periféricas, pero en ningún momento se mira si dos ciudades consecutivas del recorrido están cerca. Por eso el recorrido va saltando de un extremo a otro del plano. Que el greedy aleatorio elija al azar entre las $K = 5$ siguientes no arregla esto. Su media queda muy cerca de la del greedy (entre un 1\,\% mejor y un 8\,\% peor según la instancia) y lo único que añade es dispersión (Figura~\ref{fig:boxplot}). Lo que tiene de útil es que es instantáneo y que da soluciones iniciales distintas para las búsquedas basadas en trayectorias.
 
-\paragraph{Búsqueda local.} Reduce la desviación del greedy aleatorio entre 3,8 y 10 veces en las cuatro instancias menores. La Tabla~\ref{tab:bl-parada} muestra por qué es tan rápida en las pequeñas: en ch130, pr144 y a280 llega a un óptimo local tras unos 500--1.600 movimientos y se detiene en menos de un segundo, porque ningún intercambio mejora la solución. Ese óptimo local sigue lejos del óptimo global (98--270\,\% de desviación) porque el operador de intercambio es poco potente para el TSP: mover dos ciudades cambia cuatro arcos a la vez y casi nunca deshace un cruce entre aristas, que es el defecto típico de un mal recorrido (Figura~\ref{fig:recorridos}).
+\paragraph{Búsqueda local.} En las cuatro instancias menores reduce la desviación del greedy aleatorio entre 4,8 y 9 veces. En la Tabla~\ref{tab:bl-parada} se ve por qué es tan rápida en las pequeñas. En ch130, pr144 y a280 llega a un óptimo local después de unos 500--1.600 movimientos y para en menos de un segundo, ya que ningún intercambio mejora la solución. Ese óptimo local sigue estando lejos del global (98--261\,\% de desviación) porque el operador de intercambio es poco potente para el TSP. Al mover dos ciudades cambian cuatro arcos a la vez y casi nunca se deshace un cruce entre aristas, que es el defecto típico de un recorrido malo (Figura~\ref{fig:recorridos}).
 
 \input{tablas/tabla_bl_parada.tex}
 
-\paragraph{Búsqueda tabú.} Es el mejor algoritmo en ch130, pr144 y a280, con una desviación media entre 2,3 y 2,7 veces menor que la de la búsqueda local. La Tabla~\ref{tab:tabu} explica el motivo: en estas instancias alrededor de un tercio de las 10.000 iteraciones son movimientos de empeoramiento. Al aceptar ``la mejor de las peores'' y prohibir durante 10 iteraciones deshacer el movimiento, la búsqueda sale del óptimo local donde se habría detenido la búsqueda local y continúa descendiendo por otra zona. En 7 de las 9 ejecuciones la mejor solución global se encuentra después de la iteración 7.000, es decir, mucho después del punto en que la búsqueda local ya había terminado.
+\paragraph{Búsqueda tabú.} Es el mejor algoritmo en ch130, pr144 y a280, con una desviación media entre 1,9 y 3,1 veces menor que la de la búsqueda local. El motivo se ve en la Tabla~\ref{tab:tabu}, porque en estas instancias más o menos un tercio de las 10.000 iteraciones son movimientos de empeoramiento. Como acepta ``la mejor de las peores'' y prohíbe deshacer el movimiento durante 10 iteraciones, la búsqueda consigue salir del óptimo local en el que se habría quedado la búsqueda local y sigue bajando por otra zona. En 6 de las 9 ejecuciones la mejor solución global aparece después de la iteración 7.000, mucho después de que la búsqueda local hubiera terminado.
 
-La Figura~\ref{fig:convergencia} muestra esta dinámica. En ch130 las dos ejecuciones representadas usan la misma semilla y parten de la misma solución, por lo que sus curvas coinciden mientras ambas descienden; la búsqueda local se detiene hacia la iteración 560 y el tabú sigue mejorando poco a poco. Los picos de la solución actual corresponden a los reinicios por estancamiento (Tabla~\ref{tab:tabu}): las soluciones por diversificación empiezan muy lejos del mejor coste, porque construyen el recorrido con los arcos menos usados, y la búsqueda vuelve a descender desde ellas. Los reinicios por intensificación parten de costes mucho más bajos, porque reutilizan los arcos que más se han repetido: en ch130 sus soluciones iniciales cuestan entre 21.270 y 24.400, frente a 51.470--55.690 las de diversificación.
+En la Figura~\ref{fig:convergencia} se ve bien este comportamiento. En ch130 las dos ejecuciones que aparecen usan la misma semilla y parten de la misma solución, así que sus curvas coinciden mientras las dos bajan. La búsqueda local se para hacia la iteración 550 y el tabú sigue mejorando poco a poco. Los picos de la solución actual son los reinicios por estancamiento (Tabla~\ref{tab:tabu}). Las soluciones que salen de la diversificación empiezan muy lejos del mejor coste, porque construyen el recorrido con los arcos menos usados, y a partir de ellas la búsqueda vuelve a bajar. Los reinicios por intensificación empiezan en costes mucho más bajos al reutilizar los arcos que más se han repetido. En ch130 sus soluciones iniciales cuestan entre 20.550 y 22.480, mientras que las de diversificación cuestan 50.520--55.200.
 
 \input{tablas/tabla_tabu_interna.tex}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{convergencia.pdf}
-\caption{Convergencia de la mejor ejecución de la búsqueda tabú y de la búsqueda local en ch130, a280 y u1060 (coste en escala logarítmica). La línea fina es la solución actual del tabú y la discontinua, el óptimo.}
+\caption{Convergencia de la mejor ejecución de la búsqueda tabú y de la ejecución de la búsqueda local con la misma semilla en ch130, a280 y u1060 (coste en escala logarítmica). La línea fina es la solución actual del tabú y la discontinua, el óptimo.}
 \label{fig:convergencia}
 \end{figure}
 
-En u1060 el comportamiento cambia. La búsqueda local necesita entre 9.340 y 9.870 movimientos para llegar a un óptimo local, casi todo el máximo de 10.000. Con el mismo presupuesto, el tabú dedica casi todas sus iteraciones a descender igual que la búsqueda local (entre 0 y 175 empeoramientos, ningún reinicio), así que sus mecanismos apenas llegan a actuar. En media queda por detrás (256,8\,\% frente a 237,9\,\%), pero esa diferencia la explican las semillas, que son distintas en cada algoritmo, y no el algoritmo. Para comprobarlo se ejecutaron ambos con las mismas tres semillas (1658743, 6587431 y 5874316): el tabú obtuvo un recorrido mejor en dos de ellas (763.691 frente a 812.103, y 852.455 frente a 881.699) y peor en la tercera (815.905 frente a 780.085). Además, como la MCP prohíbe durante 10 iteraciones algunos movimientos de mejora y no hay criterio de aspiración, el descenso del tabú sigue un camino distinto al de la búsqueda local desde el principio.
+En u1060 el comportamiento es distinto. La búsqueda local necesita entre 9.595 y 9.866 movimientos para llegar a un óptimo local, y en la tercera ejecución se corta en el máximo de 10.000 sin llegar a él. Con el mismo presupuesto, el tabú pasa casi todas sus iteraciones bajando igual que la búsqueda local (entre 0 y 175 empeoramientos y ningún reinicio), por lo que sus mecanismos casi no llegan a actuar. En media queda algo por delante (256,8\,\% frente a 266,8\,\%), aunque la ventaja no es sistemática. Con la misma semilla, el tabú consigue un recorrido mejor en dos ejecuciones (852.455 frente a 881.699, y 730.441 frente a 804.383) y uno peor en la otra (815.905 frente a 780.085). Como la MCP prohíbe algunos movimientos de mejora durante 10 iteraciones y no hay criterio de aspiración, el tabú baja desde el principio por un camino distinto al de la búsqueda local.
 
-En d18512 ocurre lo mismo de forma más acusada: 10.000 iteraciones son muy pocas para 18.512 ciudades. Todas las iteraciones del tabú son de mejora (ningún empeoramiento ni reinicio), y la búsqueda tabú (7.729,2\,\% de desviación media) y la búsqueda local (7.760,0\,\%) quedan prácticamente en el mismo punto, apenas por debajo del greedy aleatorio del que parten.
+En d18512 pasa lo mismo, pero más exagerado, ya que 10.000 iteraciones son muy pocas para 18.512 ciudades. Todas las iteraciones del tabú son de mejora (no hay empeoramientos ni reinicios), y la búsqueda tabú (7.758,9\,\% de desviación media) y la búsqueda local (7.759,1\,\%) acaban prácticamente en el mismo punto, solo un poco por debajo del greedy aleatorio del que parten.
 
 \subsection{Tiempos, desviaciones e influencia del tamaño}
 
@@ -283,18 +292,18 @@ En d18512 ocurre lo mismo de forma más acusada: 10.000 iteraciones son muy poca
 \label{fig:tiempos}
 \end{figure}
 
-El tamaño de la instancia influye de tres formas:
+El tamaño de la instancia se nota en varios aspectos.
 \begin{itemize}
-    \item \textbf{Coste de los greedy.} Calcular las sumas de distancias es $O(n^2)$, pero se hace con operaciones vectorizadas de NumPy, por lo que el greedy tarda 0,16\,s incluso en d18512. El greedy aleatorio tarda 8,7\,s en esa instancia porque reordena el vector de candidatos en cada inserción. La matriz de distancias de d18512 ocupa por sí sola alrededor de 1,3\,GB.
-    \item \textbf{Presupuesto de iteraciones.} El número de movimientos necesario para llegar a un óptimo local crece con $n$ (unos 530 en ch130, 1.560 en a280 y 9.500 en u1060). Con un límite fijo de 10.000 iteraciones, en u1060 la búsqueda local apenas llega y en d18512 queda muy lejos: las tres ejecuciones de la búsqueda local y las tres del tabú se cortan en 10.000 movimientos con una desviación superior al 7.600\,\%, prácticamente la misma que la del greedy aleatorio del que parten. A partir de cierto tamaño lo que limita la calidad no es el algoritmo sino el número de iteraciones permitido.
-    \item \textbf{Tiempo por iteración.} La evaluación factorizada es $O(1)$, pero cada iteración incluye operaciones $O(n)$ (recalcular el coste, actualizar la MLP) y una exploración del DLB que puede recorrer hasta $n$ vecinos por posición. Por eso el tabú, que siempre agota las 10.000 iteraciones, tarda en las instancias pequeñas de 16 a 47 veces más que la búsqueda local, que se detiene antes. En u1060, donde ambas hacen casi todas las iteraciones, la diferencia baja a 1,2 veces (14,9\,s frente a 12,1\,s), y en d18512, donde las dos agotan las 10.000, tardan prácticamente lo mismo (77,0\,s frente a 78,7\,s).
+    \item \textbf{Coste de los greedy.} Calcular las sumas de distancias es $O(n^2)$, pero como lo hacemos con operaciones vectorizadas de NumPy el greedy tarda 0,17\,s incluso en d18512. El greedy aleatorio necesita 7,6\,s en esa instancia porque vuelve a ordenar el vector de candidatos cada vez que inserta una ciudad. Solo la matriz de distancias de d18512 ya ocupa alrededor de 1,3\,GB.
+    \item \textbf{Presupuesto de iteraciones.} Los movimientos que hacen falta para llegar a un óptimo local aumentan con $n$ (unos 540 en ch130, 1.560 en a280 y más de 9.500 en u1060). Con un límite fijo de 10.000 iteraciones, en u1060 la búsqueda local llega muy justa y en d18512 se queda muy lejos. Las tres ejecuciones de la búsqueda local y las tres del tabú se cortan en 10.000 movimientos con una desviación superior al 7.600\,\%, casi igual que la del greedy aleatorio del que parten. A partir de cierto tamaño, la calidad viene limitada más por el número de iteraciones permitido que por el algoritmo.
+    \item \textbf{Tiempo por iteración.} La evaluación factorizada es $O(1)$, pero en cada iteración también hay operaciones $O(n)$, como recalcular el coste o actualizar la MLP, y una exploración del DLB que puede llegar a recorrer $n$ vecinos por posición. Por eso el tabú, que siempre hace las 10.000 iteraciones, tarda en las instancias pequeñas entre 14 y 48 veces más que la búsqueda local, que termina antes. En u1060, donde las dos hacen casi todas las iteraciones, la diferencia baja a 1,2 veces (15,4\,s frente a 12,5\,s). En d18512 ambas agotan las 10.000 y tardan casi lo mismo (90,3\,s frente a 82,3\,s).
 \end{itemize}
 
-En resumen, la búsqueda tabú ofrece la mejor relación calidad/tiempo en las instancias de hasta unos cientos de ciudades: unos pocos segundos más que la búsqueda local a cambio de dividir su desviación entre 2,3 y 2,7. En las instancias grandes, con 10.000 iteraciones, ninguna búsqueda por trayectorias llega a desplegar sus mecanismos y las diferencias entre ellas dependen sobre todo de la semilla. Con solo tres ejecuciones por algoritmo no se ha aplicado ningún test estadístico, ya que no tendría potencia suficiente; las diferencias entre la búsqueda local y la tabú en las tres instancias pequeñas son, en cualquier caso, mucho mayores que la dispersión entre ejecuciones (Figura~\ref{fig:boxplot}).
+Con todo esto, en las instancias de hasta unos cientos de ciudades la búsqueda tabú es la que tiene mejor relación calidad/tiempo, porque por unos pocos segundos más que la búsqueda local divide su desviación entre 1,9 y 3,1. En las instancias grandes, con 10.000 iteraciones, ninguna de las búsquedas por trayectorias llega a aprovechar sus mecanismos y las diferencias entre ellas dependen sobre todo de la semilla. No hemos aplicado ningún test estadístico porque con solo tres ejecuciones por algoritmo no tendría potencia suficiente. Aun así, en las tres instancias pequeñas las diferencias entre la búsqueda local y la tabú son mucho mayores que la dispersión entre ejecuciones (Figura~\ref{fig:boxplot}).
 
 \subsection{Análisis de la mejor solución}
 
-La mejor solución de todo el estudio, medida por su desviación, es la de la búsqueda tabú en ch130: un recorrido de longitud 8.603,99, un 40,8\,\% más largo que el óptimo (6.110). La Figura~\ref{fig:recorridos} la compara con la mejor solución de la búsqueda local en la misma instancia (12.099,93; 98,0\,\%).
+Si nos fijamos en la desviación, la mejor solución de todo el estudio es la de la búsqueda tabú en ch130, un recorrido de longitud 7.791,07 que es un 27,5\,\% más largo que el óptimo (6.110). En la Figura~\ref{fig:recorridos} la comparamos con la mejor solución de la búsqueda local en la misma instancia (12.097,10; 98,0\,\%).
 
 \begin{figure}[H]
 \centering
@@ -303,11 +312,11 @@ La mejor solución de todo el estudio, medida por su desviación, es la de la b�
 \label{fig:recorridos}
 \end{figure}
 
-El recorrido de la búsqueda local tiene numerosas aristas largas que cruzan el plano y se cortan entre sí. Es un óptimo local respecto al intercambio de dos ciudades: cada cruce solo se puede eliminar invirtiendo un tramo entero del recorrido, y eso no se consigue con un único intercambio que mejore el coste. El recorrido del tabú, en cambio, avanza casi siempre entre ciudades vecinas y recorre el plano por zonas, aunque conserva algunos cruces y saltos largos. Eso es lo que significa el 40,8\,\% restante: con el operador de intercambio, ni siquiera aceptando empeoramientos se llegan a eliminar todos los cruces en 10.000 iteraciones. Un operador 2-opt que invierta el tramo entre las dos posiciones eliminaría directamente esos cruces y reduciría esta distancia.
+En el recorrido de la búsqueda local hay muchas aristas largas que atraviesan el plano y se cruzan entre ellas. Es un óptimo local para el intercambio de dos ciudades, porque para quitar cada cruce habría que invertir un tramo entero del recorrido y eso no se consigue con un solo intercambio que mejore el coste. El recorrido del tabú, por el contrario, casi siempre pasa de una ciudad a otra cercana y va cubriendo el plano por zonas, aunque todavía le quedan algunos cruces y saltos largos. De ahí viene el 27,5\,\% que falta, ya que con el operador de intercambio no se llegan a eliminar todos los cruces en 10.000 iteraciones ni siquiera aceptando empeoramientos. Una posible mejora sería una variante del operador que, en vez de intercambiar las dos ciudades, invirtiera el tramo del recorrido que hay entre ellas. Con ella se eliminaría un cruce en un solo movimiento y se reduciría esta distancia.
 
 \subsection{Ficheros de registro}
 
-Cada ejecución genera un fichero de log con los parámetros y la semilla, la solución inicial, cada movimiento aplicado con el coste anterior y el nuevo (de mejora en la búsqueda local; de mejora o de empeoramiento en el tabú, junto con el mejor del momento actual, el mejor global y el contador de estancamiento), cada reinicio por intensificación o diversificación con su nueva solución, y la solución y el coste finales. Los logs se pueden consultar en la carpeta indicada en el Anexo.
+Cada ejecución genera un fichero de log en el que se guardan los parámetros y la semilla, la solución inicial y cada movimiento aplicado con el coste anterior y el nuevo. En la búsqueda local solo hay movimientos de mejora, y en el tabú también de empeoramiento, junto con el mejor del momento actual, el mejor global y el contador de estancamiento. También se registran los reinicios por intensificación o diversificación con su nueva solución y, al final, la solución y el coste finales. Los logs están en la carpeta que se indica en el Anexo.
 
 \section{Referencias}
 

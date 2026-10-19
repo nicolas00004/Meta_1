@@ -9,7 +9,6 @@
 \usepackage{graphicx}         % Imágenes
 \usepackage{fancyhdr}         % Encabezado y pie de página
 \usepackage{tocloft}          % Mejor control de índices
-\usepackage{listings}
 \usepackage[table]{xcolor}    % Colores (una sola carga para evitar el "option clash")
 \usepackage{booktabs}
 \usepackage{float}
@@ -17,6 +16,8 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{multirow}
+\usepackage{tikz}             % Diagrama de flujo de la búsqueda tabú
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,calc}
 \usepackage{amsmath,amssymb} % Expresiones matemáticas
 \usepackage{appendix}
 \usepackage[margin=2.5cm]{geometry}
@@ -25,22 +26,6 @@
 
 % Ajuste para eliminar aviso de fancyhdr sobre headheight
 \setlength{\headheight}{15pt}
-
-% Configuración básica de Listings para Python
-\lstset{
-    language=Python,
-    basicstyle=\ttfamily\small, % Fuente monoespacio pequeña
-    keywordstyle=\color{blue}\bfseries, % Palabras clave en azul y negrita
-    commentstyle=\color{green!60!black}\itshape, % Comentarios en verde cursiva
-    stringstyle=\color{red}, % Cadenas de texto en rojo
-    showstringspaces=false,
-    tabsize=4,
-    captionpos=b % Posición del caption (b=bottom, t=top)
-}
-\renewcommand{\lstlistingname}{Listado}
-
-% Definimos un nuevo comando para funciones inline
-\newcommand{\function}[1]{\lstinline[language=Python, basicstyle=\ttfamily\small, columns=fixed]{#1}}
 
 % ===========================
 % PSEUDOCÓDIGO EN ESPAÑOL
@@ -156,7 +141,7 @@
   \section{Carpeta de Logs}
 Enlace de descarga a la carpeta con los Logs: \url{https://drive.google.com/drive/folders/1JOPyPUdfYNtIpM7BfSW0vkRCTi284ucn?usp=sharing}
 
-La carpeta contiene un subdirectorio por algoritmo (\texttt{gre}, \texttt{grea}, \texttt{b\_local} y \texttt{tabu}). Cada fichero se llama \texttt{<instancia>\_<algoritmo>\_<semilla>\_ejecucion\_<n>.log} y registra los parámetros, la solución inicial, cada movimiento con su coste (de mejora o, en el tabú, también de empeoramiento), los reinicios por estancamiento, la solución final y un resumen con el coste y el tiempo de la ejecución.
+Dentro de la carpeta hay un subdirectorio por algoritmo (\texttt{gre}, \texttt{grea}, \texttt{b\_local} y \texttt{tabu}). Los ficheros se llaman \texttt{<instancia>\_<algoritmo>\_<semilla>\_ejecucion\_<n>.log} y en ellos se registran los parámetros, la solución inicial, cada movimiento con su coste (de mejora o, en el tabú, también de empeoramiento), los reinicios por estancamiento, la solución final y un resumen con el coste y el tiempo de la ejecución.
 
 \end{appendices}
 
