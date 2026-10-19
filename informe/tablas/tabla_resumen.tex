@@ -1,18 +1,23 @@
 % Generado por generar_resultados.py a partir de logs/: no editar a mano
 \begin{table}[H]
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lrrrrrrrrrrrr}
+\centering\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrrrr}
 \toprule
- & \multicolumn{2}{c}{ch130} & \multicolumn{2}{c}{pr144} & \multicolumn{2}{c}{a280} & \multicolumn{2}{c}{u1060} & \multicolumn{2}{c}{d18512} & \multicolumn{2}{c}{Media} \\
- & Desv (\%) & T (s) & Desv (\%) & T (s) & Desv (\%) & T (s) & Desv (\%) & T (s) & Desv (\%) & T (s) & Desv (\%) & T (s) \\
+ & \multicolumn{4}{c}{Desviación media (\%)} & \multicolumn{4}{c}{Tiempo medio (s)} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Instancia ($n$) & GRE & GRA & BL & TA & GRE & GRA & BL & TA \\
 \midrule
-Greedy & 561{,}17 & 0{,}000 & 994{,}64 & 0{,}000 & 1{.}074{,}75 & 0{,}001 & 2{.}430{,}22 & 0{,}003 & 7{.}829{,}12 & 0{,}171 & 2{.}577{,}98 & 0{,}035 \\
-Greedy aleatorio & 569{,}30 & 0{,}001 & 1{.}084{,}99 & 0{,}001 & 1{.}058{,}86 & 0{,}002 & 2{.}394{,}52 & 0{,}020 & 7{.}879{,}64 & 7{,}601 & 2{.}597{,}46 & 1{,}525 \\
-Búsqueda local & 108{,}17 & 0{,}094 & 224{,}01 & 0{,}252 & 164{,}04 & 0{,}684 & 266{,}84 & 12{,}530 & 7{.}759{,}09 & 82{,}251 & 1{.}704{,}43 & 19{,}162 \\
-Búsqueda tabú & 35{,}21 & 4{,}537 & 113{,}09 & 4{,}828 & 85{,}46 & 9{,}761 & 256{,}81 & 15{,}390 & 7{.}758{,}93 & 90{,}309 & 1{.}649{,}90 & 24{,}965 \\
+\rowcolor{gray!10}ch130 (130) & 561{,}17 & 569{,}30 & 108{,}17 & \textbf{35{,}21} & $<$\,0{,}001 & 0{,}001 & 0{,}094 & 4{,}537 \\
+pr144 (144) & 994{,}64 & 1{.}084{,}99 & 224{,}01 & \textbf{113{,}09} & $<$\,0{,}001 & 0{,}001 & 0{,}252 & 4{,}828 \\
+\rowcolor{gray!10}a280 (280) & 1{.}074{,}75 & 1{.}058{,}86 & 164{,}04 & \textbf{85{,}46} & 0{,}001 & 0{,}002 & 0{,}684 & 9{,}761 \\
+u1060 (1{.}060) & 2{.}430{,}22 & 2{.}394{,}52 & 266{,}84 & \textbf{256{,}81} & 0{,}003 & 0{,}020 & 12{,}530 & 15{,}390 \\
+\rowcolor{gray!10}d18512 (18{.}512) & 7{.}829{,}12 & 7{.}879{,}64 & 7{.}759{,}09 & \textbf{7{.}758{,}93} & 0{,}171 & 7{,}601 & 82{,}251 & 90{,}309 \\
+\midrule
+Media & 2{.}577{,}98 & 2{.}597{,}46 & 1{.}704{,}43 & 1{.}649{,}90 & 0{,}035 & 1{,}525 & 19{,}162 & 24{,}965 \\
 \bottomrule
-\end{tabular}}
-\caption{Desviación media respecto al óptimo y tiempo medio por algoritmo e instancia.}
+\end{tabular}
+\end{adjustbox}
+\caption{Desviación media respecto al óptimo y tiempo medio por instancia. GRE: greedy; GRA: greedy aleatorio; BL: búsqueda local; TA: búsqueda tabú. En negrita, la menor desviación de cada instancia.}
 \label{tab:resumen}
 \end{table}

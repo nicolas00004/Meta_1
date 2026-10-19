@@ -1,15 +1,19 @@
 % Generado por generar_resultados.py a partir de logs/: no editar a mano
 \begin{table}[H]
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lrrrrrrrrrr}
+\centering\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrr}
 \toprule
- & \multicolumn{2}{c}{ch130} & \multicolumn{2}{c}{pr144} & \multicolumn{2}{c}{a280} & \multicolumn{2}{c}{u1060} & \multicolumn{2}{c}{d18512} \\
- & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) \\
+Instancia & Coste & Desv. (\%) & Tiempo (s) \\
 \midrule
-Ejecución 1 & 40{.}397{,}47 & 0{,}000 & 640{.}770{,}87 & 0{,}000 & 30{.}296{,}82 & 0{,}001 & 5{.}670{.}064{,}52 & 0{,}003 & 51{.}161{.}687{,}44 & 0{,}171 \\
+\rowcolor{gray!10}ch130 & 40{.}397{,}47 & 561{,}17 & $<$\,0{,}001 \\
+pr144 & 640{.}770{,}87 & 994{,}64 & $<$\,0{,}001 \\
+\rowcolor{gray!10}a280 & 30{.}296{,}82 & 1{.}074{,}75 & 0{,}001 \\
+u1060 & 5{.}670{.}064{,}52 & 2{.}430{,}22 & 0{,}003 \\
+\rowcolor{gray!10}d18512 & 51{.}161{.}687{,}44 & 7{.}829{,}12 & 0{,}171 \\
 \bottomrule
-\end{tabular}}
-\caption[Resultados de Greedy]{Resultados de Greedy (determinista: una sola ejecución).}
+\end{tabular}
+\end{adjustbox}
+\caption[Resultados de Greedy]{Resultados de Greedy (determinista: una sola ejecución por instancia).}
 \label{tab:gre-res}
 \end{table}

@@ -1,22 +1,26 @@
 % Generado por generar_resultados.py a partir de logs/: no editar a mano
 \begin{table}[H]
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lrrrrrrrrrr}
+\centering\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrr}
 \toprule
- & \multicolumn{2}{c}{ch130} & \multicolumn{2}{c}{pr144} & \multicolumn{2}{c}{a280} & \multicolumn{2}{c}{u1060} & \multicolumn{2}{c}{d18512} \\
- & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) \\
+ & & \multicolumn{3}{c}{Ejecución} & \multicolumn{4}{c}{Estadísticos} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-9}
+Instancia & & 1 & 2 & 3 & Mejor & Peor & Media & Desv. típ. \\
 \midrule
-Ejecución 1 & 41{.}106{,}95 & 0{,}001 & 644{.}000{,}68 & 0{,}001 & 29{.}923{,}25 & 0{,}002 & 5{.}432{.}360{,}65 & 0{,}020 & 51{.}931{.}042{,}22 & 7{,}354 \\
-Ejecución 2 & 41{.}378{,}60 & 0{,}001 & 748{.}052{,}80 & 0{,}001 & 29{.}454{,}85 & 0{,}002 & 5{.}726{.}073{,}12 & 0{,}020 & 51{.}597{.}813{,}86 & 8{,}061 \\
-Ejecución 3 & 40{.}197{,}80 & 0{,}001 & 688{.}917{,}30 & 0{,}001 & 30{.}282{,}71 & 0{,}002 & 5{.}611{.}771{,}61 & 0{,}020 & 50{.}934{.}175{,}26 & 7{,}389 \\
-\midrule
-Mejor & 40{.}197{,}80 & 0{,}001 & 644{.}000{,}68 & 0{,}001 & 29{.}454{,}85 & 0{,}002 & 5{.}432{.}360{,}65 & 0{,}020 & 50{.}934{.}175{,}26 & 7{,}354 \\
-Peor & 41{.}378{,}60 & 0{,}001 & 748{.}052{,}80 & 0{,}001 & 30{.}282{,}71 & 0{,}002 & 5{.}726{.}073{,}12 & 0{,}020 & 51{.}931{.}042{,}22 & 8{,}061 \\
-Media & 40{.}894{,}45 & 0{,}001 & 693{.}656{,}93 & 0{,}001 & 29{.}886{,}93 & 0{,}002 & 5{.}590{.}068{,}46 & 0{,}020 & 51{.}487{.}677{,}12 & 7{,}601 \\
-Desv. típica & 618{,}42 & 0{,}000 & 52{.}187{,}73 & 0{,}000 & 415{,}12 & 0{,}000 & 148{.}054{,}13 & 0{,}000 & 507{.}477{,}59 & 0{,}398 \\
+\rowcolor{gray!10}ch130 & Coste & 41{.}107 & 41{.}379 & 40{.}198 & 40{.}198 & 41{.}379 & 40{.}894 & 618 \\
+\rowcolor{gray!10} & Tiempo (s) & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & $<$\,0{,}001 \\
+pr144 & Coste & 644{.}001 & 748{.}053 & 688{.}917 & 644{.}001 & 748{.}053 & 693{.}657 & 52{.}188 \\
+ & Tiempo (s) & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & 0{,}001 & $<$\,0{,}001 \\
+\rowcolor{gray!10}a280 & Coste & 29{.}923 & 29{.}455 & 30{.}283 & 29{.}455 & 30{.}283 & 29{.}887 & 415 \\
+\rowcolor{gray!10} & Tiempo (s) & 0{,}002 & 0{,}002 & 0{,}002 & 0{,}002 & 0{,}002 & 0{,}002 & $<$\,0{,}001 \\
+u1060 & Coste & 5{.}432{.}361 & 5{.}726{.}073 & 5{.}611{.}772 & 5{.}432{.}361 & 5{.}726{.}073 & 5{.}590{.}068 & 148{.}054 \\
+ & Tiempo (s) & 0{,}020 & 0{,}020 & 0{,}020 & 0{,}020 & 0{,}020 & 0{,}020 & $<$\,0{,}001 \\
+\rowcolor{gray!10}d18512 & Coste & 51{.}931{.}042 & 51{.}597{.}814 & 50{.}934{.}175 & 50{.}934{.}175 & 51{.}931{.}042 & 51{.}487{.}677 & 507{.}478 \\
+\rowcolor{gray!10} & Tiempo (s) & 7{,}354 & 8{,}061 & 7{,}389 & 7{,}354 & 8{,}061 & 7{,}601 & 0{,}398 \\
 \bottomrule
-\end{tabular}}
-\caption[Resultados de Greedy aleatorio]{Resultados de Greedy aleatorio (semillas, en orden de ejecución: 6587431, 5874316, 8743165). Mejor y peor: menor y mayor valor de cada columna.}
+\end{tabular}
+\end{adjustbox}
+\caption[Resultados de Greedy aleatorio]{Resultados de Greedy aleatorio: coste y tiempo de cada ejecución (semillas 6587431, 5874316, 8743165, iguales en todas las instancias). Mejor y peor: menor y mayor valor de la fila. Costes redondeados a la unidad.}
 \label{tab:grea-res}
 \end{table}

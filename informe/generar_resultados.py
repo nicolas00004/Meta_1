@@ -55,72 +55,88 @@ def num(x, dec=2):
     return s.replace(",", "X").replace(".", "{,}").replace("X", "{.}")
 
 
+ABREV = {"gre": "GRE", "grea": "GRA", "b_local": "BL", "tabu": "TA"}
+TAMANOS = {"ch130": 130, "pr144": 144, "a280": 280, "u1060": 1060, "d18512": 18512}
+SOMBRA = "\\rowcolor{gray!10}"
+
+
+def inicio_tabla(columnas, tam="\\small"):
+    return ("\\begin{table}[H]\n\\centering" + tam + "\\setlength{\\tabcolsep}{4pt}\\renewcommand{\\arraystretch}{1.15}\n"
+            "\\begin{adjustbox}{max width=\\textwidth}\n\\begin{tabular}{" + columnas + "}\n\\toprule")
+
+
+def fin_tabla(caption, label):
+    return f"\\bottomrule\n\\end{{tabular}}\n\\end{{adjustbox}}\n\\caption{caption}\n\\label{{{label}}}\n\\end{{table}}\n"
+
+
+def tiempo(t):
+    """Tiempo en segundos con 3 decimales; los que redondean a 0 se muestran como < 0,001."""
+    return "$<$\\,0{,}001" if t < 0.0005 else num(t, 3)
+
+
 def tabla_algoritmo(datos, alg):
-    filas = []
     n_ejec = max(len(datos.get((i, alg), [])) for i in INSTANCIAS)
-    cab = " & ".join(f"\\multicolumn{{2}}{{c}}{{{i}}}" for i in INSTANCIAS)
-    filas.append("\\begin{table}[H]\n\\centering\\scriptsize\\setlength{\\tabcolsep}{3pt}")
-    filas.append("\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}{l" + "rr" * len(INSTANCIAS) + "}\n\\toprule")
-    filas.append(f" & {cab} \\\\")
-    filas.append(" & " + " & ".join(["Coste & T (s)"] * len(INSTANCIAS)) + " \\\\\n\\midrule")
-    for k in range(n_ejec):
-        celdas = []
-        for i in INSTANCIAS:
-            v = datos.get((i, alg), [])
-            celdas += [num(v[k]["coste"]), num(v[k]["tiempo"], 3)] if k < len(v) else ["--", "--"]
-        filas.append(f"Ejecución {k + 1} & " + " & ".join(celdas) + " \\\\")
-    # Con una sola ejecución (greedy) los estadísticos no aportan nada
-    estadisticos = (("Mejor", min), ("Peor", max), ("Media", st.mean), ("Desv. típica", st.stdev))
-    if n_ejec > 1:
-        filas.append("\\midrule")
-    for etiqueta, f in estadisticos if n_ejec > 1 else ():
-        celdas = []
-        for i in INSTANCIAS:
-            v = datos.get((i, alg), [])
-            if len(v) >= (2 if f is st.stdev else 1):
-                celdas += [num(f([r["coste"] for r in v])), num(f([r["tiempo"] for r in v]), 3)]
-            else:
-                celdas += ["--", "--"]
-        filas.append(f"{etiqueta} & " + " & ".join(celdas) + " \\\\")
-    filas.append("\\bottomrule\n\\end{tabular}}")
-    por_instancia = {i: ", ".join(str(r["semilla"]) for r in datos[(i, alg)]) for i in INSTANCIAS
-                     if datos.get((i, alg))}
     if n_ejec == 1:
-        semillas = "determinista: una sola ejecución"
-    elif len(set(por_instancia.values())) == 1:
-        semillas = f"semillas, en orden de ejecución: {next(iter(por_instancia.values()))}"
-    else:
-        semillas = "semillas por instancia, en orden de ejecución: " + "; ".join(
-            f"{i}: {s}" for i, s in por_instancia.items())
-    nota = " Mejor y peor: menor y mayor valor de cada columna." if n_ejec > 1 else ""
-    filas.append(f"\\caption[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]} ({semillas}).{nota}}}")
-    filas.append(f"\\label{{tab:{alg}-res}}\n\\end{{table}}\n")
+        # Greedy: determinista, una sola ejecución por instancia
+        filas = [inicio_tabla("lrrr"),
+                 "Instancia & Coste & Desv. (\\%) & Tiempo (s) \\\\\n\\midrule"]
+        for k, i in enumerate(INSTANCIAS):
+            r = datos[(i, alg)][0]
+            filas.append((SOMBRA if k % 2 == 0 else "") + f"{i} & {num(r['coste'])} & {num(desv(r['coste'], i))} "
+                         f"& {tiempo(r['tiempo'])} \\\\")
+        filas.append(fin_tabla(f"[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]} (determinista: una sola "
+                               "ejecución por instancia).}", f"tab:{alg}-res"))
+        return "\n".join(filas)
+
+    estadisticos = (("Mejor", min), ("Peor", max), ("Media", st.mean), ("Desv. típ.", st.stdev))
+    filas = [inicio_tabla("ll" + "r" * n_ejec + "rrrr"),
+             f" & & \\multicolumn{{{n_ejec}}}{{c}}{{Ejecución}} & \\multicolumn{{4}}{{c}}{{Estadísticos}} \\\\",
+             f"\\cmidrule(lr){{3-{2 + n_ejec}}}\\cmidrule(lr){{{3 + n_ejec}-{6 + n_ejec}}}",
+             "Instancia & & " + " & ".join(str(k + 1) for k in range(n_ejec)) + " & "
+             + " & ".join(e for e, _ in estadisticos) + " \\\\\n\\midrule"]
+    for k, i in enumerate(INSTANCIAS):
+        v = datos[(i, alg)]
+        sombra = SOMBRA if k % 2 == 0 else ""
+        # Costes redondeados a la unidad para que la tabla quepa con un tamaño de letra legible
+        for medida, clave, fmt, etiqueta in (("Coste", "coste", lambda x: num(x, 0), i),
+                                             ("Tiempo (s)", "tiempo", tiempo, "")):
+            valores = [r[clave] for r in v]
+            celdas = [fmt(x) for x in valores] + [fmt(f(valores)) for _, f in estadisticos]
+            filas.append(f"{sombra}{etiqueta} & {medida} & " + " & ".join(celdas) + " \\\\")
+    semillas = ", ".join(str(r["semilla"]) for r in datos[(INSTANCIAS[0], alg)])
+    filas.append(fin_tabla(f"[Resultados de {NOMBRES[alg]}]{{Resultados de {NOMBRES[alg]}: coste y tiempo de cada "
+                           f"ejecución (semillas {semillas}, iguales en todas las instancias). Mejor y peor: menor y "
+                           "mayor valor de la fila. Costes redondeados a la unidad.}", f"tab:{alg}-res"))
     return "\n".join(filas)
 
 
 def tabla_resumen(datos):
-    filas = ["\\begin{table}[H]\n\\centering\\scriptsize\\setlength{\\tabcolsep}{3pt}",
-             "\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}{l" + "rr" * (len(INSTANCIAS) + 1) + "}\n\\toprule",
-             " & " + " & ".join(f"\\multicolumn{{2}}{{c}}{{{i}}}" for i in INSTANCIAS)
-             + " & \\multicolumn{2}{c}{Media} \\\\",
-             " & " + " & ".join(["Desv (\\%) & T (s)"] * (len(INSTANCIAS) + 1)) + " \\\\\n\\midrule"]
-    for alg in ALGORITMOS:
-        celdas, ds, ts = [], [], []
-        for i in INSTANCIAS:
-            v = datos.get((i, alg), [])
-            if v:
-                d = st.mean(desv(r["coste"], i) for r in v)
-                t = st.mean(r["tiempo"] for r in v)
-                ds.append(d)
-                ts.append(t)
-                celdas += [num(d), num(t, 3)]
-            else:
-                celdas += ["--", "--"]
-        celdas += [num(st.mean(ds)), num(st.mean(ts), 3)]
-        filas.append(f"{NOMBRES[alg]} & " + " & ".join(celdas) + " \\\\")
-    filas += ["\\bottomrule\n\\end{tabular}}",
-              "\\caption{Desviación media respecto al óptimo y tiempo medio por algoritmo e instancia.}",
-              "\\label{tab:resumen}\n\\end{table}\n"]
+    algs = ALGORITMOS
+    filas = [inicio_tabla("l" + "r" * len(algs) + "r" * len(algs)),
+             f" & \\multicolumn{{{len(algs)}}}{{c}}{{Desviación media (\\%)}} "
+             f"& \\multicolumn{{{len(algs)}}}{{c}}{{Tiempo medio (s)}} \\\\",
+             f"\\cmidrule(lr){{2-{1 + len(algs)}}}\\cmidrule(lr){{{2 + len(algs)}-{1 + 2 * len(algs)}}}",
+             "Instancia ($n$) & " + " & ".join(ABREV[a] for a in algs) + " & "
+             + " & ".join(ABREV[a] for a in algs) + " \\\\\n\\midrule"]
+    medias_d = {a: [] for a in algs}
+    medias_t = {a: [] for a in algs}
+    for k, i in enumerate(INSTANCIAS):
+        d = {a: st.mean(desv(r["coste"], i) for r in datos[(i, a)]) for a in algs}
+        t = {a: st.mean(r["tiempo"] for r in datos[(i, a)]) for a in algs}
+        for a in algs:
+            medias_d[a].append(d[a])
+            medias_t[a].append(t[a])
+        mejor = min(d, key=d.get)
+        celdas = [f"\\textbf{{{num(d[a])}}}" if a == mejor else num(d[a]) for a in algs]
+        celdas += [tiempo(t[a]) for a in algs]
+        filas.append((SOMBRA if k % 2 == 0 else "") + f"{i} ({TAMANOS[i]:,}) & ".replace(",", "{.}")
+                     + " & ".join(celdas) + " \\\\")
+    filas.append("\\midrule")
+    filas.append("Media & " + " & ".join(num(st.mean(medias_d[a])) for a in algs) + " & "
+                 + " & ".join(tiempo(st.mean(medias_t[a])) for a in algs) + " \\\\")
+    filas.append(fin_tabla("{Desviación media respecto al óptimo y tiempo medio por instancia. GRE: greedy; GRA: greedy "
+                           "aleatorio; BL: búsqueda local; TA: búsqueda tabú. En negrita, la menor desviación de cada "
+                           "instancia.}", "tab:resumen"))
     return "\n".join(filas)
 
 

@@ -1,22 +1,26 @@
 % Generado por generar_resultados.py a partir de logs/: no editar a mano
 \begin{table}[H]
-\centering\scriptsize\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lrrrrrrrrrr}
+\centering\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llrrrrrrr}
 \toprule
- & \multicolumn{2}{c}{ch130} & \multicolumn{2}{c}{pr144} & \multicolumn{2}{c}{a280} & \multicolumn{2}{c}{u1060} & \multicolumn{2}{c}{d18512} \\
- & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) & Coste & T (s) \\
+ & & \multicolumn{3}{c}{Ejecución} & \multicolumn{4}{c}{Estadísticos} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-9}
+Instancia & & 1 & 2 & 3 & Mejor & Peor & Media & Desv. típ. \\
 \midrule
-Ejecución 1 & 12{.}191{,}81 & 0{,}089 & 211{.}454{,}79 & 0{,}279 & 6{.}092{,}60 & 0{,}649 & 780{.}085{,}34 & 12{,}827 & 51{.}170{.}029{,}17 & 84{,}423 \\
-Ejecución 2 & 12{.}097{,}10 & 0{,}104 & 175{.}230{,}01 & 0{,}263 & 7{.}488{,}31 & 0{,}697 & 881{.}699{,}36 & 12{,}272 & 50{.}828{.}025{,}85 & 82{,}503 \\
-Ejecución 3 & 13{.}868{,}04 & 0{,}090 & 182{.}305{,}30 & 0{,}213 & 6{.}848{,}08 & 0{,}704 & 804{.}383{,}15 & 12{,}492 & 50{.}131{.}542{,}75 & 79{,}828 \\
-\midrule
-Mejor & 12{.}097{,}10 & 0{,}089 & 175{.}230{,}01 & 0{,}213 & 6{.}092{,}60 & 0{,}649 & 780{.}085{,}34 & 12{,}272 & 50{.}131{.}542{,}75 & 79{,}828 \\
-Peor & 13{.}868{,}04 & 0{,}104 & 211{.}454{,}79 & 0{,}279 & 7{.}488{,}31 & 0{,}704 & 881{.}699{,}36 & 12{,}827 & 51{.}170{.}029{,}17 & 84{,}423 \\
-Media & 12{.}718{,}98 & 0{,}094 & 189{.}663{,}37 & 0{,}252 & 6{.}809{,}66 & 0{,}684 & 822{.}055{,}95 & 12{,}530 & 50{.}709{.}865{,}92 & 82{,}251 \\
-Desv. típica & 996{,}24 & 0{,}008 & 19{.}200{,}64 & 0{,}034 & 698{,}65 & 0{,}030 & 53{.}062{,}21 & 0{,}280 & 529{.}230{,}42 & 2{,}308 \\
+\rowcolor{gray!10}ch130 & Coste & 12{.}192 & 12{.}097 & 13{.}868 & 12{.}097 & 13{.}868 & 12{.}719 & 996 \\
+\rowcolor{gray!10} & Tiempo (s) & 0{,}089 & 0{,}104 & 0{,}090 & 0{,}089 & 0{,}104 & 0{,}094 & 0{,}008 \\
+pr144 & Coste & 211{.}455 & 175{.}230 & 182{.}305 & 175{.}230 & 211{.}455 & 189{.}663 & 19{.}201 \\
+ & Tiempo (s) & 0{,}279 & 0{,}263 & 0{,}213 & 0{,}213 & 0{,}279 & 0{,}252 & 0{,}034 \\
+\rowcolor{gray!10}a280 & Coste & 6{.}093 & 7{.}488 & 6{.}848 & 6{.}093 & 7{.}488 & 6{.}810 & 699 \\
+\rowcolor{gray!10} & Tiempo (s) & 0{,}649 & 0{,}697 & 0{,}704 & 0{,}649 & 0{,}704 & 0{,}684 & 0{,}030 \\
+u1060 & Coste & 780{.}085 & 881{.}699 & 804{.}383 & 780{.}085 & 881{.}699 & 822{.}056 & 53{.}062 \\
+ & Tiempo (s) & 12{,}827 & 12{,}272 & 12{,}492 & 12{,}272 & 12{,}827 & 12{,}530 & 0{,}280 \\
+\rowcolor{gray!10}d18512 & Coste & 51{.}170{.}029 & 50{.}828{.}026 & 50{.}131{.}543 & 50{.}131{.}543 & 51{.}170{.}029 & 50{.}709{.}866 & 529{.}230 \\
+\rowcolor{gray!10} & Tiempo (s) & 84{,}423 & 82{,}503 & 79{,}828 & 79{,}828 & 84{,}423 & 82{,}251 & 2{,}308 \\
 \bottomrule
-\end{tabular}}
-\caption[Resultados de Búsqueda local]{Resultados de Búsqueda local (semillas, en orden de ejecución: 6587431, 5874316, 8743165). Mejor y peor: menor y mayor valor de cada columna.}
+\end{tabular}
+\end{adjustbox}
+\caption[Resultados de Búsqueda local]{Resultados de Búsqueda local: coste y tiempo de cada ejecución (semillas 6587431, 5874316, 8743165, iguales en todas las instancias). Mejor y peor: menor y mayor valor de la fila. Costes redondeados a la unidad.}
 \label{tab:b_local-res}
 \end{table}
