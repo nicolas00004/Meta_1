@@ -1,7 +1,6 @@
-DATA=material
-archivos=x
-Semilla=77958591
-algoritmos=GRE GRA
+DATA=Material de practica 1 y 2-20260910
+SEMILLA=1658743
 K=5
-tam_poblacion=100
-n_Sol_Greedy=0.2
+ALGORITMO=b_local gre grea tabu
+N_EJECUCIONES=3
+N_ITERACIONES=10000

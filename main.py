@@ -1,40 +1,249 @@
 import os
+from random import Random
+
 import extracion_datos
-import numpy as np
-from alg_greedy import algoritmo_greedy
-from alg_greedy_aleatorio import algoritmo_greedy_aleatorizado
+import greedy
+import Extraccion_parametros
+import greedy_aleatorio
+import Busqueda_local as busqueda_local
+import Busqueda_tabu as busqueda_tabu
+from logs import Logs
+
 
 if __name__ == "__main__":
-    carpeta = "Material de práctica 1 y 2-20260910"
+
+    # Cargar los parámetros desde el archivo
+    parametros = Extraccion_parametros.cargar_param("parametros.txt")
+    carpeta=parametros['DATA']
+    semilla=parametros['SEMILLA']
+    semilla_inicial = semilla
+    k=int(parametros['K'])
+    algoritmos=parametros['ALGORITMO'].split()
+    n_ejecucion=int(parametros['N_EJECUCIONES'])
+    n_iteraciones=int(parametros['N_ITERACIONES'])
+
+    random=Random()
+
+
+
     archivos_tsp = [f for f in os.listdir(carpeta) if f.endswith('.tsp')]
+    problemas = {}
 
-    dni_base = 77958591
-    semillas = [
-        dni_base,
-        int(str(dni_base)[1:] + str(dni_base)[0]),
-        int(str(dni_base)[2:] + str(dni_base)[:2])
-    ]
 
-    for nombre_fichero in archivos_tsp:
-        ruta_archivo = os.path.join(carpeta, nombre_fichero)
-        n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
+    for algoritmo in algoritmos:
+        match (algoritmo):
+            case "gre":
+                for nombre_fichero in archivos_tsp:
+                    #Carga los datos del fichero
+                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
+                    logger = Logs(
+                        os.path.join(
+                            "logs", algoritmo,
+                            f"{nombre_base}_{algoritmo}_{semilla_inicial}_ejecucion_1.log",
+                        )
+                    )
+                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
-        if n is not None:
-            print("=" * 60)
-            print(f"PROCESANDO INSTANCIA: {nombre} ({n} nodos)")
-            print("=" * 60)
+                    if n is not None:
+                        # Almacenar en el diccionario
+                        problemas[nombre_fichero] = {
+                            "n": n,
+                            "coordenadas": m_coordenadas,
+                            "distancias": m_distancias,
+                            "nombre": nombre,
+                            "comentario": comentario
+                        }
 
-            #Ejecuta Algoritmo Greedy Determinista
-            sol_gre, coste_gre = algoritmo_greedy(m_distancias)
-            print(f"[GREEDY DETERMINISTA] Coste: {coste_gre:.2f}")
 
-            #Ejecuta Algoritmo Greedy Aleatorizado (3 ejecuciones con semillas)
+                        print(f"FICHERO PROCESADO: {nombre_fichero}")
+                        print(f"Nombre del problema: {nombre}")
+                        print(f"Comentario: {comentario}")
+                        print(f"Número de nodos: {n}")
+                        print(f"Forma de la matriz de distancias: {m_distancias.shape}")
+                        resultado, tiempo = logger.ejecutar_y_registrar(
+                            algoritmo,
+                            nombre_fichero,
+                            semilla_inicial,
+                            1,
+                            lambda: greedy.ejecucion(m_distancias, parametros),
+                        )
+                        print(f"Distancia total algoritmo greedy: {resultado}")
+                        print(f"Tiempo de ejecución: {tiempo:.6f} s")
+                        print("x"*10)
+                    else:
+                        print("Fallo en la lectura de fichero")
 
-            print("[GREEDY ALEATORIZADO (K=5)]")
-            costes_gra = []
-            for i, sem in enumerate(semillas, 1):
-                sol_gra, coste_gra = algoritmo_greedy_aleatorizado(m_distancias, k=5, semilla=sem)
-                costes_gra.append(coste_gra)
-                print(f"  - Ejecución {i} (Semilla {sem}): Coste = {coste_gra:.2f}")
+            case "grea":
+                for nombre_fichero in archivos_tsp:
+                    #Carga los datos del fichero
+                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
+                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
-            print(f"  -> Media GRA: {np.mean(costes_gra):.2f} | Desv. Típica: {np.std(costes_gra):.2f}\n")
+                    for ejecu in range(n_ejecucion):
+                        #Carga de la semilla
+                        n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
+                        print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
+                        random.seed(n_semilla)
+                        semilla = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
+
+
+
+                        if n is not None:
+                            # Almacenar en el diccionario
+                            problemas[nombre_fichero] = {
+                                "n": n,
+                                "coordenadas": m_coordenadas,
+                                "distancias": m_distancias,
+                                "nombre": nombre,
+                                "comentario": comentario
+                            }
+
+                            print(f"FICHERO PROCESADO: {nombre_fichero}")
+                            print(f"Nombre del problema: {nombre}")
+                            print(f"Comentario: {comentario}")
+                            print(f"Número de nodos: {n}")
+                            print(f"Forma de la matriz de distancias: {m_distancias.shape}")
+                            resultado, tiempo = logger.ejecutar_y_registrar(
+                                algoritmo,
+                                nombre_fichero,
+                                n_semilla,
+                                ejecu + 1,
+                                lambda: greedy_aleatorio.ejecucion(m_distancias, k, random),
+                                k=k,
+                            )
+                            print(f"Distancia total algoritmo greedy aleatorio: {resultado}")
+                            print(f"Tiempo de ejecución: {tiempo:.6f} s")
+                            print("x" * 10)
+                        else:
+                            print("Fallo en la lectura de fichero")
+            case "b_local":
+                for nombre_fichero in archivos_tsp:
+                    #Carga los datos del fichero
+                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
+                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
+
+                    for ejecu in range(n_ejecucion):
+                        #Carga de la semilla
+                        n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
+                        print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
+                        random.seed(n_semilla)
+                        semilla = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
+
+
+
+                        if n is not None:
+                            # Almacenar en el diccionario
+                            problemas[nombre_fichero] = {
+                                "n": n,
+                                "coordenadas": m_coordenadas,
+                                "distancias": m_distancias,
+                                "nombre": nombre,
+                                "comentario": comentario
+                            }
+
+                            print(f"FICHERO PROCESADO: {nombre_fichero}")
+                            print(f"Nombre del problema: {nombre}")
+                            print(f"Comentario: {comentario}")
+                            print(f"Número de nodos: {n}")
+                            print(f"Forma de la matriz de distancias: {m_distancias.shape}")
+                            resultado, tiempo = logger.ejecutar_y_registrar(
+                                algoritmo,
+                                nombre_fichero,
+                                n_semilla,
+                                ejecu + 1,
+                                lambda: busqueda_local.ejecucion(
+                                    m_distancias,
+                                    n,
+                                    n_iteraciones,
+                                    k,
+                                    random,
+                                    logger=logger,
+                                ),
+                                k=k,
+                                n_iteraciones=n_iteraciones,
+                            )
+                            print(f"Distancia total algoritmo búsqueda local: {resultado}")
+                            print(f"Tiempo de ejecución: {tiempo:.6f} s")
+                            print("x" * 10)
+                        else:
+                            print("Fallo en la lectura de fichero")
+
+            case "tabu":
+                for nombre_fichero in archivos_tsp:
+                    #Carga los datos del fichero
+                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
+                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
+                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
+
+                    # Las semillas deben ser las mismas en todos los algoritmos:
+                    # se reinicia la secuencia desde la semilla inicial en cada fichero
+                    semilla_tabu = semilla_inicial
+
+                    for ejecu in range(n_ejecucion):
+                        n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla_tabu)
+                        print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
+                        random.seed(n_semilla)
+                        semilla_tabu = n_semilla
+                        logger = Logs(
+                            os.path.join(
+                                "logs", algoritmo,
+                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
+                            )
+                        )
+
+                        if n is not None:
+                            problemas[nombre_fichero] = {
+                                "n": n,
+                                "coordenadas": m_coordenadas,
+                                "distancias": m_distancias,
+                                "nombre": nombre,
+                                "comentario": comentario
+                            }
+
+                            print(f"FICHERO PROCESADO: {nombre_fichero}")
+                            print(f"Nombre del problema: {nombre}")
+                            print(f"Comentario: {comentario}")
+                            print(f"Número de nodos: {n}")
+                            print(f"Forma de la matriz de distancias: {m_distancias.shape}")
+                            resultado, tiempo = logger.ejecutar_y_registrar(
+                                algoritmo,
+                                nombre_fichero,
+                                n_semilla,
+                                ejecu + 1,
+                                lambda: busqueda_tabu.ejecucion(
+                                    m_distancias,
+                                    n,
+                                    n_iteraciones,
+                                    k,
+                                    random,
+                                    logger=logger,
+                                    tenencia=10,
+                                    pct_estancamiento=0.05,
+                                    prob_oscilacion=0.5,
+                                ),
+                                k=k,
+                                n_iteraciones=n_iteraciones,
+                                tenencia=10,
+                                estancamiento="5%",
+                                oscilacion="50%",
+                            )
+                            print(f"Distancia total algoritmo búsqueda tabú: {resultado}")
+                            print(f"Tiempo de ejecución: {tiempo:.6f} s")
+                            print("x" * 10)
+                        else:
+                            print("Fallo en la lectura de fichero")
