@@ -194,6 +194,47 @@ class Logs:
         self.log(f"  {solucion}", "RESULT")
         self.log(f"Coste final: {coste}", "RESULT")
 
+    def log_inicio_agg(self, coste_mejor, evaluaciones):
+        self._vaciar_movimientos()
+        self.log("Población inicial creada", "INIT")
+        self.log(f"Mejor coste inicial: {coste_mejor}", "INIT")
+        self.log(f"Evaluaciones: {evaluaciones}", "INIT")
+        self.log("---", "INIT")
+
+    def log_generacion_agg(
+        self,
+        generacion,
+        evaluaciones,
+        coste_mejor_generacion,
+        coste_mejor_global,
+        mutaciones,
+        elites_reinsertados,
+    ):
+        self._movimientos_pendientes.append(
+            f"[{self._obtener_tiempo()}] [GENERACION] Generación {generacion}: "
+            f"evaluaciones {evaluaciones}; mejor de la generación: "
+            f"{coste_mejor_generacion}; mejor global: {coste_mejor_global}; "
+            f"mutaciones: {mutaciones}; élites reinsertados: {elites_reinsertados}\n"
+        )
+        if len(self._movimientos_pendientes) >= 100:
+            self._vaciar_movimientos()
+
+    def log_fin_agg(self, solucion, coste, generaciones, evaluaciones, tiempo):
+        self._resumen_busqueda_local = {
+            "Generaciones": generaciones,
+            "Evaluaciones": evaluaciones,
+            "Coste final": coste,
+        }
+        self._vaciar_movimientos()
+        self.log(
+            f"Algoritmo evolutivo generacional finalizado; generaciones: "
+            f"{generaciones}; evaluaciones: {evaluaciones}; tiempo: {tiempo:.3f} s",
+            "RESULT",
+        )
+        self.log("Mejor solución global:", "RESULT")
+        self.log(f"  {solucion}", "RESULT")
+        self.log(f"Coste final: {coste}", "RESULT")
+
     def ejecutar_y_registrar(
         self, algoritmo, fichero, semilla, numero_ejecucion, funcion, **parametros
     ):
