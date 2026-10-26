@@ -1,5 +1,5 @@
 import numpy as np
-import greedy
+import AlgGreedy_Clase4D_Grupo08 as greedy
 import random
 import Funcion_evaluacion
 

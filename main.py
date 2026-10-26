@@ -2,11 +2,11 @@ import os
 from random import Random
 
 import extracion_datos
-import greedy
+import AlgGreedy_Clase4D_Grupo08 as greedy
 import Extraccion_parametros
-import greedy_aleatorio
-import Busqueda_local as busqueda_local
-import Busqueda_Tabu as busqueda_tabu
+import AlgGreedyAleatorio_Clase4D_Grupo08 as greedy_aleatorio
+import AlgBusquedaLocal_Clase4D_Grupo08 as busqueda_local
+import AlgBusquedaTabu_Clase4D_Grupo08 as busqueda_tabu
 from logs import Logs
 
 

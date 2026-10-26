@@ -1,7 +1,7 @@
 import numpy as np
 
 import Funcion_evaluacion as evaluacion
-import greedy_aleatorio as greedya
+import AlgGreedyAleatorio_Clase4D_Grupo08 as greedya
 
 
 # La memoria es una única matriz n x n:
@@ -88,12 +88,16 @@ def diversificacion(memoria, n, random, k):
     return construir_desde_mlp(memoria, n, random, k, False)
 
 
-def busqueda_tabu(matriz_distancias, n, max_iteraciones, k, random,
-                  tenencia, estancamiento, oscilacion, logger=None):
+def busqueda_tabu(matriz_distancias, n, max_iteraciones, k, random,tenencia, estancamiento, oscilacion, logger=None):
+
+
+    #Inicialización: solución inicial por greedy aleatorio y evaluación
     solucion_actual = greedya.greedy_aleatorio(matriz_distancias, random, k)
     peso_actual = evaluacion.evaluar(matriz_distancias, solucion_actual)
+    #Creación de la memoria y variables de control
     mejor_momento_actual, peso_momento_actual = solucion_actual.copy(), peso_actual
     mejor_global, peso_global = solucion_actual.copy(), peso_actual
+
     if logger is not None:
         logger.log_inicio_tabu(solucion_actual, peso_actual)
 
@@ -127,13 +131,13 @@ def busqueda_tabu(matriz_distancias, n, max_iteraciones, k, random,
                     if mejor_vecino is None or peso_vecino < mejor_vecino[2]:
                         mejor_vecino = (i, j, peso_vecino)
                 if mov_i != -1:
-                    break  # first improvement: seguimos luego con la misma i
+                    break
                 db[i] = 1
             i = (i + 1) % n
 
         if mov_i == -1:
             if mejor_vecino is None:
-                # Todo el entorno explorado es tabú: se considera estancamiento
+                # el entorno explorado es tabú: se considera estancamiento
                 contador_estancamiento = limite_estancamiento
             else:
                 # Ninguno mejora: nos movemos a la mejor de las peores

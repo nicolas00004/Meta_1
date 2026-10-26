@@ -53,7 +53,7 @@ El código está hecho en Python y lo hemos dividido en estos módulos:
     \item \texttt{extracion\_datos.py}: lee el fichero \texttt{.tsp} y calcula la matriz de distancias con NumPy.
     \item \texttt{Extraccion\_parametros.py}: lee los parámetros y genera las semillas por rotación.
     \item \texttt{Funcion\_evaluacion.py}: función objetivo, evaluación factorizada del intercambio y aplicación del movimiento.
-    \item \texttt{greedy.py}, \texttt{greedy\_aleatorio.py}, \texttt{Busqueda\_local.py} y \texttt{Busqueda\_Tabu.py}: un módulo por algoritmo.
+    \item \texttt{AlgGreedy\_Clase4D\_Grupo08.py}, \texttt{AlgGreedyAleatorio\_Clase4D\_Grupo08.py}, \texttt{AlgBusquedaLocal\_Clase4D\_Grupo08.py} y \texttt{AlgBusquedaTabu\_Clase4D\_Grupo08.py}: un módulo por algoritmo.
     \item \texttt{logs.py}: escribe los ficheros de registro. Los movimientos se van guardando en memoria y se escriben por bloques. El tiempo que se pierde escribiendo se resta del tiempo de ejecución que damos en los resultados.
 \end{itemize}
 
@@ -251,24 +251,17 @@ En las Tablas~\ref{tab:gre-res} a~\ref{tab:tabu-res} aparecen el coste y el tiem
 \label{fig:desviacion}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{boxplot.pdf}
-\caption{Distribución de la desviación de las ejecuciones del greedy aleatorio (GA), la búsqueda local (BL) y la búsqueda tabú. Cada punto es una ejecución.}
-\label{fig:boxplot}
-\end{figure}
-
 \subsection{Análisis de los algoritmos}
 
-\paragraph{Greedy y greedy aleatorio.} Los dos dan recorridos entre 6 y 80 veces más largos que el óptimo (Tabla~\ref{tab:resumen}). El problema está en el criterio de construcción. Al ordenar las ciudades por la suma de sus distancias al resto quedan primero las ciudades centrales y después las periféricas, pero en ningún momento se mira si dos ciudades consecutivas del recorrido están cerca. Por eso el recorrido va saltando de un extremo a otro del plano. Que el greedy aleatorio elija al azar entre las $K = 5$ siguientes no arregla esto. Su media queda muy cerca de la del greedy (entre un 1\,\% mejor y un 8\,\% peor según la instancia) y lo único que añade es dispersión (Figura~\ref{fig:boxplot}). Lo que tiene de útil es que es instantáneo y que da soluciones iniciales distintas para las búsquedas basadas en trayectorias.
+\paragraph{Greedy y greedy aleatorio.} Los dos dan recorridos entre 6 y 80 veces más largos que el óptimo (Tabla~\ref{tab:resumen}). El problema está en el criterio de construcción. Al ordenar las ciudades por la suma de sus distancias al resto quedan primero las ciudades centrales y después las periféricas, pero en ningún momento se mira si dos ciudades consecutivas del recorrido están cerca. Por eso el recorrido va saltando de un extremo a otro del plano. Que el greedy aleatorio elija al azar entre las $K = 5$ siguientes no arregla esto. Su media queda muy cerca de la del greedy (entre un 1\,\% mejor y un 8\,\% peor según la instancia) y lo único que añade es dispersión. Lo que tiene de útil es que es instantáneo y que da soluciones iniciales distintas para las búsquedas basadas en trayectorias.
 
-\paragraph{Búsqueda local.} En las cuatro instancias menores reduce la desviación del greedy aleatorio entre 4,8 y 9 veces. En la Tabla~\ref{tab:bl-parada} se ve por qué es tan rápida en las pequeñas. En ch130, pr144 y a280 llega a un óptimo local después de unos 500--1.600 movimientos y para en menos de un segundo, ya que ningún intercambio mejora la solución. Ese óptimo local sigue estando lejos del global (98--261\,\% de desviación) porque el operador de intercambio es poco potente para el TSP. Al mover dos ciudades cambian cuatro arcos a la vez y casi nunca se deshace un cruce entre aristas, que es el defecto típico de un recorrido malo (Figura~\ref{fig:recorridos}).
+\paragraph{Búsqueda local.} En las cuatro instancias menores reduce la desviación del greedy aleatorio entre 4,8 y 9 veces. En la Tabla~\ref{tab:bl-parada} se ve por qué es tan rápida en las pequeñas. En ch130, pr144 y a280 llega a un óptimo local después de unos 500--1.600 movimientos y para en menos de un segundo, ya que ningún intercambio mejora la solución. Ese óptimo local sigue estando lejos del global (98--261\,\% de desviación) porque el operador de intercambio es poco potente para el TSP. Al mover dos ciudades cambian cuatro arcos a la vez y casi nunca se deshace un cruce entre aristas, que es el defecto típico de un recorrido malo.
 
 \input{tablas/tabla_bl_parada.tex}
 
 \paragraph{Búsqueda tabú.} Es el mejor algoritmo en ch130, pr144 y a280, con una desviación media entre 1,9 y 3,1 veces menor que la de la búsqueda local. El motivo se ve en la Tabla~\ref{tab:tabu}, porque en estas instancias más o menos un tercio de las 10.000 iteraciones son movimientos de empeoramiento. Como acepta ``la mejor de las peores'' y prohíbe deshacer el movimiento durante 10 iteraciones, la búsqueda consigue salir del óptimo local en el que se habría quedado la búsqueda local y sigue bajando por otra zona. En 6 de las 9 ejecuciones la mejor solución global aparece después de la iteración 7.000, mucho después de que la búsqueda local hubiera terminado.
 
-En la Figura~\ref{fig:convergencia} se ve bien este comportamiento. En ch130 las dos ejecuciones que aparecen usan la misma semilla y parten de la misma solución, así que sus curvas coinciden mientras las dos bajan. La búsqueda local se para hacia la iteración 550 y el tabú sigue mejorando poco a poco. Los picos de la solución actual son los reinicios por estancamiento (Tabla~\ref{tab:tabu}). Las soluciones que salen de la diversificación empiezan muy lejos del mejor coste, porque construyen el recorrido con los arcos menos usados, y a partir de ellas la búsqueda vuelve a bajar. Los reinicios por intensificación empiezan en costes mucho más bajos al reutilizar los arcos que más se han repetido. En ch130 sus soluciones iniciales cuestan entre 20.550 y 22.480, mientras que las de diversificación cuestan 50.520--55.200.
+En ch130 las dos ejecuciones que aparecen en la Figura~\ref{fig:convergencia} usan la misma semilla y parten de la misma solución, así que sus curvas coinciden mientras las dos bajan. La búsqueda local se para hacia la iteración 550 y el tabú sigue mejorando poco a poco. Los picos de la solución actual son los reinicios por estancamiento (Tabla~\ref{tab:tabu}). Las soluciones que salen de la diversificación empiezan muy lejos del mejor coste, porque construyen el recorrido con los arcos menos usados, y a partir de ellas la búsqueda vuelve a bajar. Los reinicios por intensificación empiezan en costes mucho más bajos al reutilizar los arcos que más se han repetido. En ch130 sus soluciones iniciales cuestan entre 20.550 y 22.480, mientras que las de diversificación cuestan 50.520--55.200.
 
 \input{tablas/tabla_tabu_interna.tex}
 
@@ -299,29 +292,10 @@ El tamaño de la instancia se nota en varios aspectos.
     \item \textbf{Tiempo por iteración.} La evaluación factorizada es $O(1)$, pero en cada iteración también hay operaciones $O(n)$, como recalcular el coste o actualizar la MLP, y una exploración del DLB que puede llegar a recorrer $n$ vecinos por posición. Por eso el tabú, que siempre hace las 10.000 iteraciones, tarda en las instancias pequeñas entre 14 y 48 veces más que la búsqueda local, que termina antes. En u1060, donde las dos hacen casi todas las iteraciones, la diferencia baja a 1,2 veces (15,4\,s frente a 12,5\,s). En d18512 ambas agotan las 10.000 y tardan casi lo mismo (90,3\,s frente a 82,3\,s).
 \end{itemize}
 
-Con todo esto, en las instancias de hasta unos cientos de ciudades la búsqueda tabú es la que tiene mejor relación calidad/tiempo, porque por unos pocos segundos más que la búsqueda local divide su desviación entre 1,9 y 3,1. En las instancias grandes, con 10.000 iteraciones, ninguna de las búsquedas por trayectorias llega a aprovechar sus mecanismos y las diferencias entre ellas dependen sobre todo de la semilla. No hemos aplicado ningún test estadístico porque con solo tres ejecuciones por algoritmo no tendría potencia suficiente. Aun así, en las tres instancias pequeñas las diferencias entre la búsqueda local y la tabú son mucho mayores que la dispersión entre ejecuciones (Figura~\ref{fig:boxplot}).
+Con todo esto, en las instancias de hasta unos cientos de ciudades la búsqueda tabú es la que tiene mejor relación calidad-tiempo, porque por unos pocos segundos más que la búsqueda local divide su desviación entre 1,9 y 3,1. En las instancias grandes, con 10.000 iteraciones, ninguna de las búsquedas por trayectorias llega a aprovechar sus mecanismos y las diferencias entre ellas dependen sobre todo de la semilla. No hemos aplicado ningún test estadístico porque con solo tres ejecuciones por algoritmo no tendría potencia suficiente. Aun así, en las tres instancias pequeñas las diferencias entre la búsqueda local y la tabú son mucho mayores que la dispersión entre ejecuciones.
 
 \subsection{Análisis de la mejor solución}
 
-Si nos fijamos en la desviación, la mejor solución de todo el estudio es la de la búsqueda tabú en ch130, un recorrido de longitud 7.791,07 que es un 27,5\,\% más largo que el óptimo (6.110). En la Figura~\ref{fig:recorridos} la comparamos con la mejor solución de la búsqueda local en la misma instancia (12.097,10; 98,0\,\%).
+Si nos fijamos en la desviación, la mejor solución de todo el estudio es la de la búsqueda tabú en ch130, un recorrido de longitud 7.791,07 que es un 27,5\,\% más largo que el óptimo (6.110). La mejor solución de la búsqueda local en la misma instancia es bastante peor, con una longitud de 12.097,10 (98,0\,\%).
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{recorridos_ch130.pdf}
-\caption{Mejor recorrido de la búsqueda local y de la búsqueda tabú en ch130.}
-\label{fig:recorridos}
-\end{figure}
-
-En el recorrido de la búsqueda local hay muchas aristas largas que atraviesan el plano y se cruzan entre ellas. Es un óptimo local para el intercambio de dos ciudades, porque para quitar cada cruce habría que invertir un tramo entero del recorrido y eso no se consigue con un solo intercambio que mejore el coste. El recorrido del tabú, por el contrario, casi siempre pasa de una ciudad a otra cercana y va cubriendo el plano por zonas, aunque todavía le quedan algunos cruces y saltos largos. De ahí viene el 27,5\,\% que falta, ya que con el operador de intercambio no se llegan a eliminar todos los cruces en 10.000 iteraciones ni siquiera aceptando empeoramientos. Una posible mejora sería una variante del operador que, en vez de intercambiar las dos ciudades, invirtiera el tramo del recorrido que hay entre ellas. Con ella se eliminaría un cruce en un solo movimiento y se reduciría esta distancia.
-
-\subsection{Ficheros de registro}
-
-Cada ejecución genera un fichero de log en el que se guardan los parámetros y la semilla, la solución inicial y cada movimiento aplicado con el coste anterior y el nuevo. En la búsqueda local solo hay movimientos de mejora, y en el tabú también de empeoramiento, junto con el mejor del momento actual, el mejor global y el contador de estancamiento. También se registran los reinicios por intensificación o diversificación con su nueva solución y, al final, la solución y el coste finales. Los logs están en la carpeta que se indica en el Anexo.
-
-\section{Referencias}
-
-\begin{itemize}
-    \item Material de la asignatura Metaheurísticas, Universidad de Jaén, curso 2026/2027.
-    \item Reinelt, G. (1991). TSPLIB --- A Traveling Salesman Problem Library. \textit{ORSA Journal on Computing}, 3(4), 376--384. Óptimos de las instancias: \url{http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/}.
-    \item Glover, F. y Laguna, M. (1997). \textit{Tabu Search}. Kluwer Academic Publishers.
-\end{itemize}
+La búsqueda local acaba en un óptimo local para el intercambio de dos ciudades, y en estos recorridos suelen quedar aristas largas que atraviesan el plano y se cruzan entre ellas. Para quitar cada cruce habría que invertir un tramo entero del recorrido, y eso no se consigue con un solo intercambio que mejore el coste. El tabú sí puede salir de ahí porque acepta empeoramientos, y por eso sus recorridos van casi siempre de una ciudad a otra cercana. Pero como usa el mismo operador de intercambio, en 10.000 iteraciones no le da tiempo a quitar todos los cruces y saltos largos, y de ahí viene el 27,5\,\% que le falta. Una posible mejora sería cambiar el operador para que, en vez de intercambiar las dos ciudades, invierta el tramo del recorrido que hay entre ellas. Así se quitaría un cruce en un solo movimiento y se reduciría esta distancia.

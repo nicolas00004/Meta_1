@@ -70,6 +70,10 @@
 \begin{titlepage}
     \centering
 
+    % Logo arriba
+    \includegraphics[width=0.5\textwidth]{ujaen.png}\par
+    \vspace{0.8cm}
+
     % Título principal
     {\Huge \textbf{Práctica 1}\par}
     \vspace{0.3cm}
@@ -90,22 +94,12 @@
     {\large \textbf{Autores:}\par}
     \vspace{0.3cm}
     \begin{tabular}{lll}
-        Alejandro Ríos Cabello & arc00166 & DNI: XXXXXXXXX \\
-        Nicolás Rafael Chelaru Tanase & nrct0001 & DNI: XXXXXXXXX \\
+        Alejandro Ríos Cabello & arc00166 & DNI: 77958591E \\
+        Nicolás Rafael Chelaru Tanase & nrct0001 & DNI: Y1658743C \\
     \end{tabular}\par
     \vspace{0.5cm}
-    {\large \textbf{Grupo:} XX\par}
+    {\large \textbf{Grupo:} 08\par}
     \vspace{1cm}
-
-    {\large Universidad de Jaén\par}
-    \vspace{0.5cm}
-
-    % Fecha
-    {\large \today\par}
-
-    % Logo abajo
-    \vfill
-    \IfFileExists{imagenes/ujaen.jpg}{\includegraphics[width=0.3\textwidth]{imagenes/ujaen.jpg}}{\textbf{Universidad de Jaén}}
 
 \end{titlepage}
 \hypersetup{pageanchor=true}
@@ -140,7 +134,7 @@
   \addappheadtotoc        % añade esa página al TOC
 
   \section{Carpeta de Logs}
-Enlace de descarga a la carpeta con los Logs: \url{https://drive.google.com/drive/folders/1JOPyPUdfYNtIpM7BfSW0vkRCTi284ucn?usp=sharing}
+Enlace de descarga a la carpeta con los Logs: \url{https://drive.google.com/drive/folders/11J3Nz6esAcI5eahmU4_k4VhWtSjmZ47B?usp=sharing}
 
 Dentro de la carpeta hay un subdirectorio por algoritmo (\texttt{gre}, \texttt{grea}, \texttt{b\_local} y \texttt{tabu}). Los ficheros se llaman \texttt{<instancia>\_<algoritmo>\_<semilla>\_ejecucion\_<n>.log} y en ellos se registran los parámetros, la solución inicial, cada movimiento con su coste (de mejora o, en el tabú, también de empeoramiento), los reinicios por estancamiento, la solución final y un resumen con el coste y el tiempo de la ejecución.
 

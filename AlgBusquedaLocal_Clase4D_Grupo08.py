@@ -1,5 +1,5 @@
 import Funcion_evaluacion as evaluacion
-import greedy_aleatorio as greedya
+import AlgGreedyAleatorio_Clase4D_Grupo08 as greedya
 
 
 def busqueda_local(matriz_distancias, n, max_iteraciones, k, random, logger=None):

@@ -1,4 +1,4 @@
-from operator import truediv
+
 
 
 def evaluar(matriz_distancias,vector_asignaciones):
