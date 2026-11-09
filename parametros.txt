@@ -1,19 +1,36 @@
 DATA=Material de práctica 1 y 2-20260910
 SEMILLA=1658743
 K=5
-ALGORITMO=b_local gre grea tabu agg
+ALGORITMO=agg
 N_EJECUCIONES=3
 N_ITERACIONES=10000
 TENENCIA=10
 ESTANCAMIENTO=0.05
 OSCILACION=0.5
-t_max=60
-E=2
-kbest=5
-kworst=3
-prob_mutacion=0.1
-operador_cruce=MOC
-probabilidad_cruce=0.7
+# Algoritmo evolutivo generacional: los parámetros admiten varios valores separados por
+# espacios y se ejecutan todas las combinaciones
+operador_cruce=OX2 MOC
+E=1 2 3
+kbest=2 3
+kworst=2 3
 tam_poblacion=100
 porcentaje_greedy=0.2
-n_evaluaciones=10000
+K_AGG=10
+probabilidad_cruce=0.7
+prob_mutacion=0.1
+# Probabilidad de que cada posición entre en el cruce OX2 (no es la probabilidad de cruce)
+prob_posicion_ox2=0.5
+n_evaluaciones=50000
+t_max=120
+PROCESOS=10
+# Ficheros y carpetas
+CARPETA_LOGS=logs
+CARPETA_RESULTADOS=resultados
+FICHERO_OPTIMOS=_best.txt
+FICHERO_CSV_AGG=agg_resultados.csv
+FICHERO_MD_AGG=agg_comparaciones.md
+FICHERO_XLSX_AGG=Tablas_AGG.xlsx
+# Líneas de log que se acumulan antes de escribirlas en disco
+TAM_BUFFER_LOG=100
+# Instancias de las tablas, en el orden de la plantilla (nombre:ciudades)
+INSTANCIAS_TABLAS=a280:280 ch130:130 d18512:18512 pr144:144 u1060:1060

@@ -4,8 +4,9 @@ import time
 
 
 class Logs:
-    def __init__(self, archivo):
+    def __init__(self, archivo, tam_buffer):
         self.archivo = Path(archivo)
+        self.tam_buffer = tam_buffer
         self._tiempo_escritura = 0.0
         self._movimientos_pendientes = []
         self._datos_resumen = {}
@@ -104,7 +105,7 @@ class Logs:
             f"{self._formatear_vector_bits(vector_bits)}\n"
             f"[{self._obtener_tiempo()}] [MOVE] ---\n"
         )
-        if len(self._movimientos_pendientes) >= 100:
+        if len(self._movimientos_pendientes) >= self.tam_buffer:
             self._vaciar_movimientos()
 
     def log_fallo_intercambio_busqueda_local(self, posicion, vector_bits):
@@ -115,7 +116,7 @@ class Logs:
             f"{self._formatear_vector_bits(vector_bits)}\n"
             f"[{self._obtener_tiempo()}] [MOVE] ---\n"
         )
-        if len(self._movimientos_pendientes) >= 100:
+        if len(self._movimientos_pendientes) >= self.tam_buffer:
             self._vaciar_movimientos()
 
     def log_fin_busqueda_local(
@@ -165,7 +166,7 @@ class Logs:
             f"estancamiento: {estancamiento}\n"
             f"[{self._obtener_tiempo()}] [TABU] ---\n"
         )
-        if len(self._movimientos_pendientes) >= 100:
+        if len(self._movimientos_pendientes) >= self.tam_buffer:
             self._vaciar_movimientos()
 
     def log_reinicio_tabu(self, iteracion, tipo, solucion, coste):
@@ -216,7 +217,7 @@ class Logs:
             f"{coste_mejor_generacion}; mejor global: {coste_mejor_global}; "
             f"mutaciones: {mutaciones}; élites reinsertados: {elites_reinsertados}\n"
         )
-        if len(self._movimientos_pendientes) >= 100:
+        if len(self._movimientos_pendientes) >= self.tam_buffer:
             self._vaciar_movimientos()
 
     def log_fin_agg(self, solucion, coste, generaciones, evaluaciones, tiempo):

@@ -7,7 +7,7 @@ import Extraccion_parametros
 import AlgGreedyAleatorio_Clase4D_Grupo08 as greedy_aleatorio
 import AlgBusquedaLocal_Clase4D_Grupo08 as busqueda_local
 import AlgBusquedaTabu_Clase4D_Grupo08 as busqueda_tabu
-import algoritmo_evolutivo_generacional as evolutivo_generacional
+import experimentos_agg
 from logs import Logs
 
 
@@ -25,16 +25,8 @@ if __name__ == "__main__":
     tenencia=int(parametros['TENENCIA'])
     estancamiento=float(parametros['ESTANCAMIENTO'])
     oscilacion=float(parametros['OSCILACION'])
-    tiempo_max=float(parametros['t_max'])
-    n_elite=int(parametros['E'])
-    kbest=int(parametros['kbest'])
-    kworst=int(parametros['kworst'])
-    prob_mutacion=float(parametros['prob_mutacion'])
-    operador_cruce=parametros['operador_cruce']
-    probabilidad_cruce=float(parametros['probabilidad_cruce'])
-    tam_poblacion=int(parametros['tam_poblacion'])
-    porcentaje_greedy=float(parametros['porcentaje_greedy'])
-    n_evaluaciones=int(parametros['n_evaluaciones'])
+    carpeta_logs=parametros['CARPETA_LOGS']
+    tam_buffer_log=int(parametros['TAM_BUFFER_LOG'])
 
     random=Random()
 
@@ -53,9 +45,10 @@ if __name__ == "__main__":
                     nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
                     logger = Logs(
                         os.path.join(
-                            "logs", algoritmo,
+                            carpeta_logs, algoritmo,
                             f"{nombre_base}_{algoritmo}_{semilla_inicial}_ejecucion_1.log",
-                        )
+                        ),
+                        tam_buffer_log,
                     )
                     n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
 
@@ -106,9 +99,10 @@ if __name__ == "__main__":
                         semilla = n_semilla
                         logger = Logs(
                             os.path.join(
-                                "logs", algoritmo,
+                                carpeta_logs, algoritmo,
                                 f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
-                            )
+                            ),
+                            tam_buffer_log,
                         )
 
 
@@ -159,9 +153,10 @@ if __name__ == "__main__":
                         semilla = n_semilla
                         logger = Logs(
                             os.path.join(
-                                "logs", algoritmo,
+                                carpeta_logs, algoritmo,
                                 f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
-                            )
+                            ),
+                            tam_buffer_log,
                         )
 
 
@@ -220,9 +215,10 @@ if __name__ == "__main__":
                         semilla = n_semilla
                         logger = Logs(
                             os.path.join(
-                                "logs", algoritmo,
+                                carpeta_logs, algoritmo,
                                 f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
-                            )
+                            ),
+                            tam_buffer_log,
                         )
 
                         if n is not None:
@@ -256,67 +252,6 @@ if __name__ == "__main__":
                         else:
                             print("Fallo en la lectura de fichero")
             case "agg":
-                for nombre_fichero in archivos_tsp:
-                    #Carga los datos del fichero
-                    ruta_archivo = os.path.join(carpeta, nombre_fichero)
-                    nombre_base = os.path.splitext(os.path.basename(nombre_fichero))[0]
-                    n, m_coordenadas, m_distancias, nombre, comentario = extracion_datos.extraccion_Archivo(ruta_archivo)
-
-                    # Cada algoritmo e instancia parte de la misma semilla: la ejecución k
-                    # usa la misma semilla en todos los algoritmos (lo exige el guion)
-                    semilla = semilla_inicial
-                    for ejecu in range(n_ejecucion):
-                        #Carga de la semilla
-                        n_semilla = Extraccion_parametros.permutar_semilla_circular(semilla)
-                        print("---------------------La semilla es:--------------", n_semilla, "en la ejecucion", ejecu)
-                        random.seed(n_semilla)
-                        semilla = n_semilla
-                        logger = Logs(
-                            os.path.join(
-                                "logs", algoritmo,
-                                f"{nombre_base}_{algoritmo}_{n_semilla}_ejecucion_{ejecu + 1}.log",
-                            )
-                        )
-
-                        if n is not None:
-                            print(f"FICHERO PROCESADO: {nombre_fichero}")
-                            print(f"Número de nodos: {n}")
-                            resultado, tiempo = logger.ejecutar_y_registrar(
-                                algoritmo,
-                                nombre_fichero,
-                                n_semilla,
-                                ejecu + 1,
-                                lambda: evolutivo_generacional.ejecucion(
-                                    m_distancias,
-                                    n,
-                                    k,
-                                    random,
-                                    tam_poblacion,
-                                    porcentaje_greedy,
-                                    n_evaluaciones,
-                                    n_elite,
-                                    kbest,
-                                    kworst,
-                                    prob_mutacion,
-                                    tiempo_max,
-                                    operador_cruce,
-                                    probabilidad_cruce,
-                                    logger=logger,
-                                ),
-                                k=k,
-                                tam_poblacion=tam_poblacion,
-                                porcentaje_greedy=porcentaje_greedy,
-                                n_evaluaciones=n_evaluaciones,
-                                elite=n_elite,
-                                kbest=kbest,
-                                kworst=kworst,
-                                prob_mutacion=prob_mutacion,
-                                operador_cruce=operador_cruce,
-                                probabilidad_cruce=probabilidad_cruce,
-                                t_max=tiempo_max,
-                            )
-                            print(f"Distancia total algoritmo evolutivo generacional: {resultado}")
-                            print(f"Tiempo de ejecución: {tiempo:.6f} s")
-                            print("x" * 10)
-                        else:
-                            print("Fallo en la lectura de fichero")
+                # Los parámetros del AGG admiten varios valores en parametros.txt y se
+                # ejecutan todas las combinaciones (ver experimentos_agg.py)
+                experimentos_agg.ejecutar_todo(parametros)

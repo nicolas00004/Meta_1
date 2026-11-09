@@ -1,5 +1,5 @@
 import time
-import AlgGreedyAleatorio_Clase4D_Grupo08 as greedy_aleatorio
+import numpy as np
 import individuo
 
 # Esquema de cada generación:
@@ -20,14 +20,43 @@ def creacion_sol_aleatorias(num_sol, aleatorio, tam_sol):
     return poblacion_aleatoria
 
 
+def orden_greedy(m_distancias):
+    '''
+    Ciudades ordenadas por la suma de su fila de distancias, como en el greedy aleatorio de la P1.
+    Ese orden no cambia entre llamadas, así que se calcula una sola vez por ejecución
+    (la P1 reordena la lista tras cada ciudad y en d18512 cada greedy tarda unos 10 s).
+    '''
+    vector = [(i, float(m_distancias[i].sum(dtype=np.float64))) for i in range(m_distancias.shape[0])]
+    vector.sort(key=lambda x: x[1])
+    return vector
+
+
+def greedy_aleatorio_ordenado(orden, aleatorio, k):
+    '''
+    Greedy aleatorio de la P1 partiendo del orden ya calculado: hace las mismas llamadas
+    al generador aleatorio, así que con la misma semilla devuelve la misma solución.
+    '''
+    vector = orden.copy()
+    v_asignacion = []
+    while vector:
+        if len(vector) < k:
+            indice_aleatorio = aleatorio.randint(0, len(vector) - 1)
+        else:
+            indice_aleatorio = aleatorio.randint(0, k - 1)
+        v_asignacion.append(vector.pop(indice_aleatorio)[0])
+    return v_asignacion
+
+
 def poblacion_inicial(tam_sol, k, tam_poblacion, porcentaje_greedy, m_distancias, aleatorio):
-    # Una parte de la población sale del greedy aleatorio y el resto son permutaciones aleatorias puras
+    # Una parte de la población sale del greedy aleatorio de la P1 (k = tamaño de la LRC)
+    # y el resto son permutaciones aleatorias puras
     tam_greedy_sol = int(tam_poblacion * porcentaje_greedy)
     tam_aleatorios = tam_poblacion - tam_greedy_sol
 
     poblacion_greedy = []
+    orden = orden_greedy(m_distancias)
     for i in range(tam_greedy_sol):
-        sol = greedy_aleatorio.greedy_aleatorio(m_distancias, aleatorio, k)
+        sol = greedy_aleatorio_ordenado(orden, aleatorio, k)
         poblacion_greedy.append(individuo.Individuo(sol))
 
     poblacion_aleatoria = creacion_sol_aleatorias(tam_aleatorios, aleatorio, tam_sol)
@@ -46,13 +75,13 @@ def evaluar_poblacion(poblacion, m_distancias):
     return evaluaciones
 
 
-'''
-Se define una función de cruce OX2 con un número de posiciones seleccionadas de forma aleatoria según la probabilidad de cruce indicada por el usuairo en los parámetros
-'''
-def cruce_ox2(i, j, aleatorio, probabilidad_cruce):
-    # Primero generamos una lista con los elemento de j que se van a cambiar
+def ox2_imponer(i, j, posiciones):
+    '''
+    Copia de i en la que las ciudades que j tiene en las posiciones elegidas se colocan
+    en el orden en que aparecen en j.
+    '''
     hijo = individuo.Individuo(i.asignacion.copy())
-    lista_seleccionados = [item for item in j.asignacion if aleatorio.random() < probabilidad_cruce]
+    lista_seleccionados = [j.asignacion[p] for p in posiciones]
     # Conjunto para que la comprobación sea O(1): con listas el cruce es O(n^2) y en d18512 no termina
     conjunto_seleccionados = set(lista_seleccionados)
     siguiente = 0
@@ -61,6 +90,15 @@ def cruce_ox2(i, j, aleatorio, probabilidad_cruce):
             hijo.asignacion[indice] = lista_seleccionados[siguiente]
             siguiente += 1
     return hijo
+
+
+def cruce_ox2(i, j, aleatorio, prob_posicion):
+    '''
+    Cruce OX2: se eligen al azar varias posiciones (cada una con probabilidad prob_posicion) y se usan
+    las mismas posiciones para los dos hijos, cambiando el papel de los padres.
+    '''
+    posiciones = [p for p in range(len(i.asignacion)) if aleatorio.random() < prob_posicion]
+    return ox2_imponer(i, j, posiciones), ox2_imponer(j, i, posiciones)
 
 
 def cruce_moc(i, j, aleatorio, tam):
@@ -93,6 +131,7 @@ def intercambio_2_opt(solucion, i, j):
 
 
 def mutacion(poblacion, tam, probabilidad_mutacion, aleatorio):
+    # Cada individuo muta con probabilidad probabilidad_mutacion: intercambio de dos posiciones distintas
     mutaciones = 0
     for ind in poblacion:
         if aleatorio.random() < probabilidad_mutacion:
@@ -137,7 +176,19 @@ def seleccion_padre_por_torneo(poblacion, aleatorio, Kbest):
     return ganador
 
 
-def seleccion_cruce(poblacion, probabilidad_cruce, aleatorio, kbest, operador_cruce):
+def heredar_coste(hijo, padre1, padre2):
+    '''
+    Si el cruce devuelve un hijo idéntico a uno de sus padres (padres iguales, o punto de corte 0
+    en MOC), ese recorrido ya se evaluó: se copia el coste y no se gasta otra evaluación.
+    '''
+    for padre in (padre1, padre2):
+        if padre.evaluado and hijo.asignacion == padre.asignacion:
+            hijo.coste = padre.coste
+            hijo.evaluado = True
+            return
+
+
+def seleccion_cruce(poblacion, probabilidad_cruce, aleatorio, kbest, operador_cruce, prob_posicion_ox2):
     '''
     Hace la selección junto con la recombinación: por cada pareja se eligen dos padres por torneo
     y se cruzan, así que basta con recorrer la mitad de la población para obtener una nueva entera.
@@ -149,12 +200,13 @@ def seleccion_cruce(poblacion, probabilidad_cruce, aleatorio, kbest, operador_cr
         if aleatorio.random() < probabilidad_cruce:
             # Se cruzan los padres
             if operador_cruce == "OX2":
-                hijo1 = cruce_ox2(padre1, padre2, aleatorio, probabilidad_cruce)
-                hijo2 = cruce_ox2(padre2, padre1, aleatorio, probabilidad_cruce)
+                hijo1, hijo2 = cruce_ox2(padre1, padre2, aleatorio, prob_posicion_ox2)
             elif operador_cruce == "MOC":
                 hijo1, hijo2 = cruce_moc(padre1, padre2, aleatorio, len(padre1.asignacion))
             else:
                 raise ValueError(f"Operador de cruce desconocido: {operador_cruce}")
+            heredar_coste(hijo1, padre1, padre2)
+            heredar_coste(hijo2, padre1, padre2)
         else:
             # No se cruzan: los hijos son copias de los padres (ya evaluadas, no gastan evaluación)
             hijo1 = padre1.copia()
@@ -185,7 +237,7 @@ def esta_poblacion(individuo, poblacion):
 
 def algoritmo_evolutivo_generacional(tam, k, tam_poblacion, porcentaje_greedy, m_distancias, aleatorio,
                                      max_evaluaciones, n_elite, Kbest, K_worst, prob_mutacion, tiempo_max,
-                                     operador_cruce, probabilidad_cruce, logger=None):
+                                     operador_cruce, probabilidad_cruce, prob_posicion_ox2, logger=None):
     gen = 0
     tiempo_inicio = time.perf_counter()
 
@@ -196,12 +248,14 @@ def algoritmo_evolutivo_generacional(tam, k, tam_poblacion, porcentaje_greedy, m
     if logger is not None:
         logger.log_inicio_agg(mejor_individuo.coste, cont)
 
+    # El límite de tiempo incluye la creación de la población inicial
     while cont < max_evaluaciones and (time.perf_counter() - tiempo_inicio) < tiempo_max:
         gen = gen + 1
         # Obtenemos la poblacion elite
         elite = obtener_elite(poblacion_actual, n_elite)
         # Selección por torneo y cruce
-        poblacion_actual = seleccion_cruce(poblacion_actual, probabilidad_cruce, aleatorio, Kbest, operador_cruce)
+        poblacion_actual = seleccion_cruce(poblacion_actual, probabilidad_cruce, aleatorio, Kbest, operador_cruce,
+                                           prob_posicion_ox2)
         # Mutación
         mutaciones = mutacion(poblacion_actual, tam, prob_mutacion, aleatorio)
         # Evaluamos los hijos que todavía no tienen coste
@@ -231,9 +285,11 @@ def algoritmo_evolutivo_generacional(tam, k, tam_poblacion, porcentaje_greedy, m
 
 
 def ejecucion(m_distancias, n, k, random, tam_poblacion, porcentaje_greedy, max_evaluaciones, n_elite,
-              kbest, kworst, prob_mutacion, tiempo_max, operador_cruce, probabilidad_cruce, logger=None):
+              kbest, kworst, prob_mutacion, tiempo_max, operador_cruce, probabilidad_cruce,
+              prob_posicion_ox2, logger=None):
     mejor_individuo, _ = algoritmo_evolutivo_generacional(
         n, k, tam_poblacion, porcentaje_greedy, m_distancias, random, max_evaluaciones, n_elite,
-        kbest, kworst, prob_mutacion, tiempo_max, operador_cruce, probabilidad_cruce, logger=logger,
+        kbest, kworst, prob_mutacion, tiempo_max, operador_cruce, probabilidad_cruce,
+        prob_posicion_ox2, logger=logger,
     )
     return mejor_individuo.coste
